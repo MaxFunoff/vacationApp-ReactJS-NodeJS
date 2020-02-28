@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const handler = require('../handlers/vacations')
-// const auth = require('../auth/jwtAuth')
+const auth = require('../auth/jwtAuth')
 const authAdmin = require('../auth/jwtAuthAdmin')
 const multer = require('multer')
 
@@ -31,7 +31,13 @@ router.get('/', handler.allVacations);
 router.get('/:id', handler.byID);
 
 /* POST vacations listing */
-router.post('/', upload.single('image'), handler.createVacation)
+router.post('/', authAdmin, upload.single('image'), handler.createVacation)
+router.post('/:id', auth, handler.addVacationToUser)
+
+
+
+/* DELETE vacations listing */
+router.delete('/:id', auth, handler.removeVacationFromUser)
 
 
 

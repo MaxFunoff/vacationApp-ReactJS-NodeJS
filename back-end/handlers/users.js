@@ -12,12 +12,13 @@ const allUsers = async (req, res) => {
     let code = 500;
 
     const query =
-        `SELECT u.id as userId, u.email as userEmail, utv.user_id as vUserId, v.id as vacationId, v.name as vacationName 
+        `SELECT u.id as userId, u.email as userEmail, utv.user_id as vUserId, v.id as vacationId, v.name as vacationName, v.image as vacationImage
     FROM users u 
     LEFT JOIN users_to_vacations utv 
     ON u.id = utv.user_id 
     LEFT JOIN vacations v 
-    ON v.id = utv.vacation_id`
+    ON v.id = utv.vacation_id 
+    ORDER BY u.id ASC`
 
     try {
         let mqRes = await pool.execute(query)
@@ -45,7 +46,7 @@ const byID = async (req, res) => {
     const id = req.params.id;
 
     const query =
-        `SELECT u.id as userId, u.email as userEmail, utv.user_id as vUserId, v.id as vacationId, v.name as vacationName 
+        `SELECT u.id as userId, u.email as userEmail, utv.user_id as vUserId, v.id as vacationId, v.name as vacationName, v.image as vacationImage
     FROM users u 
     LEFT JOIN users_to_vacations utv 
     ON u.id = utv.user_id 
@@ -53,7 +54,7 @@ const byID = async (req, res) => {
     ON v.id = utv.vacation_id WHERE u.id = ?`
 
     try {
-        let mqRes = await pool.execute(query,[id])
+        let mqRes = await pool.execute(query, [id])
         let data = mqRes[0];
 
         response.data = mapUserData(data);
@@ -92,9 +93,9 @@ const registerUser = async (req, res) => {
             VALUES (?, ?)`
 
         try {
-            let mqRes = await pool.execute(query, [user.email, user.password])
+            await pool.execute(query, [user.email, user.password])
             response.success = true;
-            response.data = mqRes[0];
+            response.data = 'User created succesfully';
             code = 200;
         }
         catch (err) {
@@ -231,7 +232,7 @@ const logOut = async (req, res) => {
 
 /*Access Token Generation*/
 const generateToken = (user) => {
-    return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '10m' });
+    return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '30m' });
 }
 
 
@@ -259,11 +260,13 @@ const mapUserData = (data) => {
 
 /*Check Vacations*/
 const checkVacation = (item) => {
-    VacationId = item.vacationId,
-        VacationName = item.vacationName
-    if (VacationId == null) return;
+    console.log(item)
+    vacationId = item.vacationId;
+    vacationName = item.vacationName;
+    vacationImage = item.vacationImage;
+    if (vacationId == null) return;
 
-    return ({ VacationId: VacationId, VacationName: VacationName })
+    return ({ id: vacationId, Name: vacationName, Image: vacationImage })
 }
 
 module.exports = {
