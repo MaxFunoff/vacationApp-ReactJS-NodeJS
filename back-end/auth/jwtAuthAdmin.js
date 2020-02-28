@@ -12,6 +12,7 @@ module.exports = authenticateToken = async (req, res, next) => {
 
         try {
             req.user = await bringUserType(user)
+            if(req.user.type != 'admin') throw 401
             next()
         }
         catch (err) {
