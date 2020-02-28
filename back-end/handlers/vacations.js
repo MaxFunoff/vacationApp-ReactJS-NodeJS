@@ -26,7 +26,7 @@ const allVacations = async (req, res) => {
     res.status(code).json(response)
 }
 
-const allVacations = async (req, res) => {
+const byID = async (req, res) => {
     let response = {
         success: false,
     }
