@@ -1,18 +1,18 @@
 const express = require('express');
 const router = express.Router();
-const usersController = require('../controllers/users')
+const handler = require('../handlers/users')
 const auth = require('../auth/jwtAuth')
 
 /* GET users listing. */
-router.get('/', auth, usersController.allUsers);
-router.get('/:id', auth, usersController.byID);
+router.get('/', auth, handler.allUsers);
+router.get('/:id', auth, handler.byID);
 
 /* POST users listing */
-router.post('/', usersController.registerUser)
-router.post('/login', usersController.loginUser)
-router.post('/token', usersController.tokenRefresh)
+router.post('/', handler.registerUser)
+router.post('/login', handler.loginUser)
+router.post('/token', handler.tokenRefresh)
 
 /*DELETE users listing*/
-router.delete('/logout', usersController.logOut)
+router.delete('/logout', handler.logOut)
 
 module.exports = router;
