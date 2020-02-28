@@ -5,7 +5,7 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const cors = require('cors')
 const usersRouter = require('./routes/users');
-const jwtAuth = ('./jwt/jwtAuth')
+const vacationsRouter = require('./routes/vacations');
 const app = express();
 
 /*Cors Config When Production*/
@@ -19,6 +19,7 @@ app.use(cookieParser());
 
 
 app.use('/users', usersRouter);
+app.use('/vacations', vacationsRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
