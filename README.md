@@ -5,9 +5,7 @@ make vacations unavailable, view statistics and etc.
 
 
 This project uses:
-
 NodeJS for the back-end
-
 ReactJS for the front-end
 
 
@@ -19,5 +17,4 @@ ReactJS for the front-end
 
 
 BACK-END: [■■■■■■■■□□]80%
-
 FRONT-END: [□□□□□□□□□□]0%
