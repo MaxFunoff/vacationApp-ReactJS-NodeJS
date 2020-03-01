@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 28, 2020 at 11:07 PM
+-- Generation Time: Mar 01, 2020 at 08:14 PM
 -- Server version: 10.4.11-MariaDB
 -- PHP Version: 7.4.1
 
@@ -57,7 +57,9 @@ CREATE TABLE `users` (
 CREATE TABLE `users_to_vacations` (
   `id` varchar(256) NOT NULL,
   `user_id` int(10) UNSIGNED NOT NULL,
-  `vacation_id` int(10) UNSIGNED NOT NULL
+  `vacation_id` int(10) UNSIGNED NOT NULL,
+  `status` enum('pending refund','pending approval','approved','refunded') NOT NULL DEFAULT 'pending approval',
+  `status_change_date` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
