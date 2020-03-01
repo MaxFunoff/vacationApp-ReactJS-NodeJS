@@ -43,7 +43,8 @@ const byID = async (req, res) => {
 
     let code = 500;
 
-    const id = req.params.id;
+    const id = req.params.id != 'profile' ? req.params.id : req.user.id;
+
 
     const query =
         `SELECT u.id as userId, u.email as userEmail, utv.user_id as vUserId, v.id as vacationId, v.name as vacationName, v.image as vacationImage
