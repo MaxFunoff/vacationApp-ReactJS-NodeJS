@@ -11,14 +11,21 @@ const allUsers = async (req, res) => {
     }
     let code = 500;
 
+    const adminContent = req.user.type === 'admin' ? `, v.id as vacationId,
+    v.name as vacationName,
+    v.image as vacationImage,
+    utv.status as status,
+    DATE_FORMAT(utv.status_change_date, '%Y-%m-%d %H:%i') as lastChanged ` : '';
+
     const query =
-        `SELECT u.id as userId, u.email as userEmail, utv.user_id as vUserId, v.id as vacationId, v.name as vacationName, v.image as vacationImage
+        `SELECT u.id as userId, u.email as userEmail, utv.user_id as vUserId ${adminContent} 
     FROM users u 
     LEFT JOIN users_to_vacations utv 
     ON u.id = utv.user_id 
     LEFT JOIN vacations v 
     ON v.id = utv.vacation_id 
     ORDER BY u.id ASC`
+
 
     try {
         let mqRes = await pool.execute(query)
@@ -41,18 +48,25 @@ const byID = async (req, res) => {
         success: false,
     }
 
-    let code = 500;
+    let code = 401;
 
     const id = req.params.id != 'profile' ? req.params.id : req.user.id;
 
+    const adminContent = req.user.type === 'admin' || id === req.user.id ?
+        `, v.id as vacationId,
+    v.name as vacationName,
+    v.image as vacationImage,
+    utv.status as status,
+    DATE_FORMAT(utv.status_change_date, '%Y-%m-%d %H:%i') as lastChanged ` : '';
 
     const query =
-        `SELECT u.id as userId, u.email as userEmail, utv.user_id as vUserId, v.id as vacationId, v.name as vacationName, v.image as vacationImage
+        `SELECT u.id as userId, u.email as userEmail, utv.user_id as vUserId ${adminContent}
     FROM users u 
     LEFT JOIN users_to_vacations utv 
     ON u.id = utv.user_id 
     LEFT JOIN vacations v 
-    ON v.id = utv.vacation_id WHERE u.id = ?`
+    ON v.id = utv.vacation_id 
+    WHERE u.id = ?`
 
     try {
         let mqRes = await pool.execute(query, [id])
@@ -142,7 +156,6 @@ const loginUser = async (req, res) => {
             id: mqRes[0][0].id,
         }
         let accessToken = generateToken(user);
-        console.log(accessToken)
         let refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET);
 
         query =
@@ -243,16 +256,24 @@ const mapUserData = (data) => {
     data.map(item => {
         let indexUser = users.findIndex(user => user.Id == item.userId);
         if (indexUser == -1) {
+
             let _user = {
                 Id: item.userId,
                 Email: item.userEmail,
-                Vacations: [checkVacation(item)]
             }
+            let _vacation = checkVacation(item);
+            if (_vacation != null)
+                _user.Vacations = [_vacation]
+
+
             users.push(_user)
 
         } else {
             let _vacation = checkVacation(item);
-            users[indexUser].Vacations.push(_vacation)
+            if(_vacation != null && users[indexUser].Vacations)
+                users[indexUser].Vacations.push(_vacation); 
+            if(_vacation != null && !users[indexUser].Vacations)
+                users[indexUser].Vacations = [_vacation]
         }
     });
 
@@ -261,13 +282,9 @@ const mapUserData = (data) => {
 
 /*Check Vacations*/
 const checkVacation = (item) => {
-    console.log(item)
-    vacationId = item.vacationId;
-    vacationName = item.vacationName;
-    vacationImage = item.vacationImage;
-    if (vacationId == null) return;
-
-    return ({ id: vacationId, Name: vacationName, Image: vacationImage })
+    if (item.vacationId == null) return;
+    const vacation = { id: item.vacationId, Name: item.vacationName, Image: item.vacationImage, Status: item.status, lastStatusChange: item.lastChanged }
+    return (vacation)
 }
 
 module.exports = {

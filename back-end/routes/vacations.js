@@ -36,7 +36,7 @@ router.post('/:id/add', auth, handler.addVacationToUser)
 
 
 
-/* DELETE vacations listing */
+/* PUT vacations listing */
 router.put('/:id/refund', auth, handler.removeVacationFromUser)
 
 
