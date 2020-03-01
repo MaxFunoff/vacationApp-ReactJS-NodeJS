@@ -32,12 +32,12 @@ router.get('/:id', handler.byID);
 
 /* POST vacations listing */
 router.post('/', authAdmin, upload.single('image'), handler.createVacation)
-router.post('/:id', auth, handler.addVacationToUser)
+router.post('/:id/add', auth, handler.addVacationToUser)
 
 
 
 /* DELETE vacations listing */
-router.delete('/:id', auth, handler.removeVacationFromUser)
+router.put('/:id/refund', auth, handler.removeVacationFromUser)
 
 
 
