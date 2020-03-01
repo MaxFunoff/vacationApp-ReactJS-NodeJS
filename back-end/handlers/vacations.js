@@ -125,13 +125,13 @@ const removeVacationFromUser = async (req, res) => {
     const specialID = userID.toString() + '$' + vacationID.toString();
 
     const query =
-        `DELETE FROM users_to_vacations WHERE id = ?`
+        `UPDATE users_to_vacations SET status='pending refund' WHERE id = ?`
 
     try {
         await pool.execute(query, [specialID])
         response.success = true;
-        response.data = 'Vacation removed from the user succesfully'
-        code = 200;
+        response.data = 'Refund for vacations has been issued'
+        code = 202;
     }
     catch (err) {
         code = 500;
