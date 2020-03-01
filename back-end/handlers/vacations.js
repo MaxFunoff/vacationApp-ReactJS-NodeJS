@@ -69,7 +69,7 @@ const createVacation = async (req, res) => {
         VALUES (?, ?, ?, ?, ?, ?)`
 
     try {
-        let mqRes = await pool.execute(query, vacation)
+        await pool.execute(query, vacation)
 
         response.data = 'Vacation created succesfully';
         response.success = true;
@@ -98,7 +98,7 @@ const addVacationToUser = async (req, res) => {
         VALUES (?, ?, ?)`
 
     try {
-        let mqRes = await pool.execute(query, [specialID, userID, vacationID])
+        await pool.execute(query, [specialID, userID, vacationID])
         response.success = true;
         response.data = 'Vacation added to user succesfully'
         code = 201;
