@@ -146,10 +146,42 @@ const refundVacationFromUser = async (req, res) => {
     res.status(code).json(response)
 }
 
+const cancelRefundVacation = async (req, res) => {
+    let response = {
+        success: false,
+    }
+    let code = 500;
+    const userID = req.user.id;
+    const vacationID = req.params.id;
+    const specialID = userID.toString() + '$' + vacationID.toString();
+
+    const query =
+        `UPDATE users_to_vacations
+        SET status= CASE 
+            WHEN status='pending refund' THEN 'approved'
+            ELSE status
+        END
+        WHERE id = ?`
+
+    try {
+        await pool.execute(query, [specialID])
+        response.success = true;
+        response.data = 'Refund for vacations has been cancelled'
+        code = 200;
+    }
+    catch (err) {
+        console.log(err)
+        code = 500;
+        response.err = 'Please try again later'
+    }
+    res.status(code).json(response)
+}
+
 module.exports = {
     allVacations,
     byID,
     createVacation,
     addVacationToUser,
     refundVacationFromUser,
+    cancelRefundVacation,
 }
