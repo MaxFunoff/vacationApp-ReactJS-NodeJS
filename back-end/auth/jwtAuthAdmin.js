@@ -1,14 +1,22 @@
 require('dotenv').config()
 const jwt = require('jsonwebtoken')
 const pool = require('../mysql/dbpool')
+const refresh = require('./tokenRefresh')
 
 module.exports = authenticateToken = async (req, res, next) => {
-    const authHeader = req.headers['authorization']
-    const token = authHeader && authHeader.split(' ')[1]
+    const token = req.cookies.token
     if (token == null) return res.sendStatus(401)
 
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async (err, user) => {
-        if (err) return res.sendStatus(403)
+        if (err && !refreshToken) return res.sendStatus(403)
+        else if (err && refreshToken) {
+            try {
+                refresh(req, res, refreshToken)
+            }
+            catch (err) {
+                res.sendStatus(err)
+            }
+        }
 
         try {
             req.user = await bringUserType(user)

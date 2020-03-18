@@ -30,3 +30,6 @@ const upload = multer({
 
     //Admin POST Vacation
 router.post('/vacation', authAdmin, upload.single('image'), handler.createVacation)
+
+
+module.exports = router;

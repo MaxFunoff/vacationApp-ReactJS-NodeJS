@@ -10,7 +10,6 @@ router.get('/:id', auth, handler.byID);
 /* POST users listing */
 router.post('/', handler.registerUser)
 router.post('/login', handler.loginUser)
-router.post('/token', handler.tokenRefresh)
 
 /*DELETE users listing*/
 router.delete('/logout', handler.logOut)

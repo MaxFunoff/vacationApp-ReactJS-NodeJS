@@ -154,6 +154,7 @@ const loginUser = async (req, res) => {
         let user = {
             email: mqRes[0][0].email,
             id: mqRes[0][0].id,
+            type: mqRes[0][0].type,
         }
         let accessToken = generateToken(user);
         let refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET);
@@ -163,9 +164,9 @@ const loginUser = async (req, res) => {
         VALUES (?)`
         try {
             await pool.execute(query, [refreshToken])
-            response.accessToken = accessToken;
-            response.refreshToken = refreshToken;
-
+            response.data = user;
+            res.cookie('token', accessToken, { maxAge: 60 * 30, httpOnly: true});
+            res.cookie('refresh-token', refreshToken, { maxAge: 60 * 60 * 24 * 7, httpOnly: true});
             response.success = true;
             code = 200;
         }
@@ -181,42 +182,7 @@ const loginUser = async (req, res) => {
     res.status(code).json(response)
 }
 
-const tokenRefresh = async (req, res) => {
 
-    let response = {
-        success: false
-    }
-
-    let refreshToken = req.body.token
-    if (!refreshToken) return res.status(401).json(response)
-
-    const query =
-        `SELECT * 
-    FROM tokens
-    WHERE token = ?`
-
-
-    try {
-        let mqRes = await pool.execute(query, [refreshToken])
-        if (!mqRes[0][0]) return res.status(403).json(response)
-
-        jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
-            const _user = {
-                email: user.email,
-                id: user.id,
-            }
-            const accessToken = generateToken(_user)
-
-            response.success = true;
-            response.accessToken = accessToken;
-            res.status(200).json(response);
-        });
-
-    }
-    catch (err) {
-        res.status(500).json(response)
-    }
-}
 
 const logOut = async (req, res) => {
 
@@ -236,7 +202,7 @@ const logOut = async (req, res) => {
     try {
         await pool.execute(query, [refreshToken])
         response.success = true
-        res.status(200).json(response)
+        res.clearCookie('token').clearCookie('refresh-token').status(200).json(response)
     }
     catch (err) {
         res.status(500).json(response)
@@ -292,7 +258,6 @@ module.exports = {
     byID,
     registerUser,
     loginUser,
-    tokenRefresh,
     logOut,
 }
 
