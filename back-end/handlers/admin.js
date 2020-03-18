@@ -28,3 +28,10 @@ const createVacation = async (req, res) => {
     res.status(code).json(response)
 
 }
+
+
+
+
+module.exports = {
+    createVacation,
+}
