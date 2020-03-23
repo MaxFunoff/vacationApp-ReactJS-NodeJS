@@ -30,8 +30,6 @@ const createVacation = async (req, res) => {
 }
 
 
-
-
 module.exports = {
     createVacation,
 }
