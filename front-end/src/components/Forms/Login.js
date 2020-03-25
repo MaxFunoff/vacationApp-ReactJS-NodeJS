@@ -65,6 +65,13 @@ class Login extends React.Component {
         axios.post('http://localhost:8000/users/login', {
             email: this.state.email,
             password: this.state.password,
+        },{
+            withCredentials: true,
+            credentials: 'include',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
         })
             .then((response) => {
                 this.setState({redirect: '/home'})
