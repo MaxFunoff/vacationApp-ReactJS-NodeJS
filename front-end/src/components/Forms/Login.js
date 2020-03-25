@@ -65,9 +65,17 @@ class Login extends React.Component {
         axios.post('http://localhost:8000/users/login', {
             email: this.state.email,
             password: this.state.password,
+        },{
+            withCredentials: true,
+            credentials: 'include',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
         })
             .then((response) => {
-                this.setState({redirect: '/home'})
+                console.log(response)
+                this.setState({ redirect: '/home' })
             })
             .catch((error) => {
                 let err = false;
@@ -91,6 +99,19 @@ class Login extends React.Component {
                     err,
                 })
                 console.log(error.response.status);
+            });
+    }
+
+    test = (e) => {
+        e.preventDefault();
+        console.log(':)')
+        axios.get('http://localhost:8000/users/profile',
+         { withCredentials: true, credentials: 'include'})
+            .then((response) => {
+                console.log(response)
+            })
+            .catch((error) => {
+                console.log(error)
             });
     }
 
@@ -157,6 +178,16 @@ class Login extends React.Component {
                             </Grid>
                         </Grid>
                     </form>
+                    <Button
+                        type="submit"
+                        fullWidth
+                        variant="contained"
+                        color="primary"
+                        className={classes.submit}
+                        onClick={this.test}
+                    >
+                        Gimmi
+                    </Button>
                 </div>
             </Container>
         );
