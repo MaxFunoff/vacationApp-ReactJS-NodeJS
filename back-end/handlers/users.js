@@ -156,7 +156,7 @@ const loginUser = async (req, res) => {
             id: mqRes[0][0].id,
             type: mqRes[0][0].type,
         }
-        let accessToken = generateToken(user);
+        let accessToken = await generateToken(user);
         let refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET);
 
         query =
@@ -165,8 +165,8 @@ const loginUser = async (req, res) => {
         try {
             await pool.execute(query, [refreshToken])
             response.data = user;
-            res.cookie('token', accessToken, { maxAge: 60 * 30, httpOnly: true});
-            res.cookie('refresh-token', refreshToken, { maxAge: 60 * 60 * 24 * 7, httpOnly: true});
+            res.cookie('access-token', accessToken, { maxAge: (60 * 30 * 24 * 7), httpOnly: true});
+            res.cookie('refresh-token', refreshToken, { maxAge: (60 * 60 * 24 * 7), httpOnly: true});
             response.success = true;
             code = 200;
         }
@@ -211,7 +211,7 @@ const logOut = async (req, res) => {
 
 
 /*Access Token Generation*/
-const generateToken = (user) => {
+const generateToken = async (user) => {
     return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '30m' });
 }
 
