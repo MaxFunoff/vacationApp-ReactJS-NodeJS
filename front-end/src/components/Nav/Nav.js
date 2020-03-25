@@ -14,7 +14,10 @@ class Nav extends React.Component {
                         <Link to="/">Home</Link>
                     </li>
                     <li>
-                        <Link to="/connect">Connect</Link>
+                        <Link to="/login">Login</Link>
+                    </li>
+                    <li>
+                        <Link to="/register">Register</Link>
                     </li>
                 </ul>
             </div>
