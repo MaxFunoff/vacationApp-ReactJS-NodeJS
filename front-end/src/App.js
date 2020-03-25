@@ -6,9 +6,16 @@ import {
   Route,
 } from "react-router-dom";
 
+/* Material-UI */
+import { Container } from '@material-ui/core';
+
+/* Pages Component */
 import Home from './pages/Home/Home'
-import Connect from './pages/Connect/Connect'
+import Connect from './pages/Connect.js/Connect'
+
+/*Componenets*/
 import Navbar from './components/Nav/Nav'
+
 
 function App() {
   return (
@@ -19,16 +26,17 @@ function App() {
           <Navbar />
         </nav>
 
-        <main>
+        <Container maxWidth="sm">
           <Switch>
 
-            <Route path="/connect" component={Connect}/>
-            
+            <Route path="/Login" component={() => <Connect formType='login' />} />
+            <Route path="/Register" component={() => <Connect formType='register' />} />
+
             <Route path="/" exact={true} component={Home} />
 
           </Switch>
-        </main>
-        
+        </Container>
+
       </Router>
     </div>
   );
