@@ -4,14 +4,16 @@ const pool = require('../mysql/dbpool')
 const refresh = require('./tokenRefresh')
 
 module.exports = authenticateToken = async (req, res, next) => {
-    const token = req.cookies.token
-    if (token == null) return res.sendStatus(401)
 
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async (err, user) => {
-        if (err && !refreshToken) return res.sendStatus(403)
-        else if (err && refreshToken) {
+    const cookies = req.cookies
+
+    if (cookies['access-token'] == null) return res.sendStatus(401)
+
+    jwt.verify(cookies['access-token'], process.env.ACCESS_TOKEN_SECRET, async (err, user) => {
+        if (err && !cookies['refresh-token']) return res.sendStatus(403)
+        else if (err && cookies['refresh-token']) {
             try {
-                refresh(req, res, refreshToken)
+                refresh(req, res, cookies['refresh-token'])
             }
             catch (err) {
                 res.sendStatus(err)
@@ -20,7 +22,7 @@ module.exports = authenticateToken = async (req, res, next) => {
 
         try {
             req.user = await bringUserType(user)
-            if(req.user.type != 'admin') throw 401
+            if (req.user.type != 'admin') throw 401
             next()
         }
         catch (err) {
@@ -30,7 +32,7 @@ module.exports = authenticateToken = async (req, res, next) => {
 }
 
 bringUserType = async (user) => {
-    let _user = {...user};
+    let _user = { ...user };
     let query =
         `SELECT type
         FROM users
