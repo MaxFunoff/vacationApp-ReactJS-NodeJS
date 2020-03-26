@@ -65,7 +65,7 @@ class Login extends React.Component {
         axios.post('http://localhost:8000/users/login', {
             email: this.state.email,
             password: this.state.password,
-        },{
+        }, {
             withCredentials: true,
             credentials: 'include',
             headers: {
@@ -74,7 +74,7 @@ class Login extends React.Component {
             },
         })
             .then((response) => {
-                this.setState({redirect: '/home'})
+                this.setState({ redirect: '/home' })
             })
             .catch((error) => {
                 let err = false;
@@ -82,10 +82,11 @@ class Login extends React.Component {
                 let loginMsg = ''
 
                 console.log(error.response)
-                if (error.response.status >= 500 && error.response.status < 600)
+                if (!error.response)
+                    err = true  
+                else if (error.response.status >= 500 && error.response.status < 600)
                     err = true
-
-                if (error.response.status === 401) {
+                else if (error.response.status === 401) {
                     loginErr = true
                     loginMsg = 'Email or Password is incorrect'
                 }
@@ -97,7 +98,6 @@ class Login extends React.Component {
                     },
                     err,
                 })
-                console.log(error.response.status);
             });
     }
 
