@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken')
 
 const saltRounds = 10;
 
-const allUsers = async (req, res) => {
+const users = async (req, res) => {
     let response = {
         success: false,
     }
@@ -223,8 +223,7 @@ const checkVacation = (item) => {
 }
 
 module.exports = {
-    allUsers,
-    byID,
+    users,
     registerUser,
     loginUser,
     logOut,
