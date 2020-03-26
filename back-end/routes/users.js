@@ -4,8 +4,7 @@ const handler = require('../handlers/users')
 const auth = require('../auth/jwtAuth')
 
 /* GET users listing. */
-router.get('/', auth, handler.allUsers);
-router.get('/:id', auth, handler.byID);
+router.get('/', auth, handler.users);
 
 /* POST users listing */
 router.post('/', handler.registerUser)
