@@ -7,7 +7,7 @@ import {
 } from "react-router-dom";
 
 /* Material-UI */
-import { Container } from '@material-ui/core';
+import { Container, CssBaseline } from '@material-ui/core';
 
 /* Pages Component */
 import Home from './pages/Home/Home'
@@ -20,6 +20,7 @@ import Navbar from './components/Nav/Nav'
 function App() {
   return (
     <div className="App">
+      <CssBaseline />
       <Router>
 
         <nav>
