@@ -11,6 +11,11 @@ const allUsers = async (req, res) => {
     }
     let code = 500;
 
+    const id = req.query.id;
+    if (req.user.type != 'admin' && id && req.user.id != id) return res.status(403).json(response)
+
+    const userByID = id ? `WHERE u.id = ?` : `ORDER BY u.id ASC`;
+
     const adminContent = req.user.type === 'admin' ? `, v.id as vacationId,
     v.name as vacationName,
     v.image as vacationImage,
@@ -24,11 +29,16 @@ const allUsers = async (req, res) => {
     ON u.id = utv.user_id 
     LEFT JOIN vacations v 
     ON v.id = utv.vacation_id 
-    ORDER BY u.id ASC`
+    ${userByID}`
 
 
     try {
-        let mqRes = await pool.execute(query)
+        let mqRes;
+        if(id)
+            mqRes = await pool.execute(query, [id])
+        else
+            mqRes = await pool.execute(query)
+        
         let data = mqRes[0];
 
         response.data = mapUserData(data);
@@ -165,8 +175,8 @@ const loginUser = async (req, res) => {
         try {
             await pool.execute(query, [refreshToken])
             response.data = user;
-            res.cookie('access-token', accessToken, { maxAge: (60 * 30 * 24 * 7), httpOnly: true});
-            res.cookie('refresh-token', refreshToken, { maxAge: (60 * 60 * 24 * 7), httpOnly: true});
+            res.cookie('access-token', accessToken, { maxAge: (60 * 30 * 24 * 7), httpOnly: true });
+            res.cookie('refresh-token', refreshToken, { maxAge: (60 * 60 * 24 * 7), httpOnly: true });
             response.success = true;
             code = 200;
         }
@@ -236,9 +246,9 @@ const mapUserData = (data) => {
 
         } else {
             let _vacation = checkVacation(item);
-            if(_vacation != null && users[indexUser].Vacations)
-                users[indexUser].Vacations.push(_vacation); 
-            if(_vacation != null && !users[indexUser].Vacations)
+            if (_vacation != null && users[indexUser].Vacations)
+                users[indexUser].Vacations.push(_vacation);
+            if (_vacation != null && !users[indexUser].Vacations)
                 users[indexUser].Vacations = [_vacation]
         }
     });
