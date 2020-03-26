@@ -53,47 +53,6 @@ const allUsers = async (req, res) => {
     res.status(code).json(response)
 }
 
-const byID = async (req, res) => {
-    let response = {
-        success: false,
-    }
-
-    let code = 401;
-
-    const id = req.params.id != 'profile' ? req.params.id : req.user.id;
-
-    const adminContent = req.user.type === 'admin' || id === req.user.id ?
-        `, v.id as vacationId,
-    v.name as vacationName,
-    v.image as vacationImage,
-    utv.status as status,
-    DATE_FORMAT(utv.status_change_date, '%Y-%m-%d %H:%i') as lastChanged ` : '';
-
-    const query =
-        `SELECT u.id as userId, u.email as userEmail, utv.user_id as vUserId ${adminContent}
-    FROM users u 
-    LEFT JOIN users_to_vacations utv 
-    ON u.id = utv.user_id 
-    LEFT JOIN vacations v 
-    ON v.id = utv.vacation_id 
-    WHERE u.id = ?`
-
-    try {
-        let mqRes = await pool.execute(query, [id])
-        let data = mqRes[0];
-
-        response.data = mapUserData(data);
-        response.success = true;
-        code = 200;
-    }
-    catch (err) {
-        response.err = err;
-        code = 500;
-    }
-
-    res.status(code).json(response)
-}
-
 const registerUser = async (req, res) => {
     let response = {
         success: false,
