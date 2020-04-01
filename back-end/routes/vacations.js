@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const handler = require('../handlers/vacations')
 const auth = require('../auth/jwtAuth')
-const authAdmin = require('../auth/jwtAuthAdmin')
+// const authAdmin = require('../auth/jwtAuthAdmin')
 
 
 /* GET vacations listing. */

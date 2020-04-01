@@ -29,6 +29,7 @@ const createVacation = async (req, res) => {
 
 }
 
+/* Add more functions */
 
 module.exports = {
     createVacation,
