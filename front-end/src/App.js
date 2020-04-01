@@ -27,7 +27,7 @@ function App() {
           <Navbar />
         </nav>
 
-        <Container maxWidth="sm">
+        <Container maxWidth="lg">
           <Switch>
 
             <Route path="/Login" component={() => <Connect formType='login' />} />
