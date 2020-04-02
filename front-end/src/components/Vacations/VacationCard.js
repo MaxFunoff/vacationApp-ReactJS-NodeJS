@@ -79,17 +79,37 @@ export default function ImgMediaCard(props) {
     const handleExpandClick = () => {
         setExpanded(!expanded);
     };
-    console.log(props.vacation)
+
+    const handleAddClick = () => {
+        console.log('Add Clicked')
+    }
 
 
     return (
-        <Box m={2} display="flex" alignSelf='flex-start'>
-            <Card className={classes.cardStyle}>
+        <Box
+            m={2}
+            display="flex"
+            alignSelf='flex-start'
+        >
+            <Card
+                className={classes.cardStyle}
+            >
                 <CardActionArea>
-                    <Paper className={classes.paperStyle}>
-                        <Box display='flex' justifyContent='center' component="div">
-                            <Typography className={classes.dateTypograhpyStlye} variant="h6" component="h1">
+                    <Paper
+                        className={classes.paperStyle}
+                    >
+                        <Box
+                            display='flex'
+                            justifyContent='center'
+                            component="div">
+                            <Typography
+                                className={classes.dateTypograhpyStlye}
+                                variant="h6"
+                                component="h1"
+                            >
+
                                 {startDate} - {endDate}
+
                             </Typography>
                         </Box>
                     </Paper>
@@ -101,18 +121,32 @@ export default function ImgMediaCard(props) {
                         title={props.vacation.name + ' picture'}
                     />
                     <CardContent>
-                        <Typography gutterBottom variant="h5" component="h2">
+                        <Typography
+                            gutterBottom
+                            variant="h5"
+                            component="h2"
+                        >
                             {props.vacation.name}
                         </Typography>
                     </CardContent>
                 </CardActionArea>
-                <CardActions disableSpacing>
-                    <IconButton aria-label="add to your vacations">
+
+                <CardActions
+                    disableSpacing
+                >
+                    <IconButton
+                        onClick={handleAddClick}
+                        aria-label="add to your vacations"
+                    >
                         <AddIcon />
                     </IconButton>
-                    <IconButton aria-label="share">
+
+                    <IconButton
+                        aria-label="share"
+                    >
                         <ShareIcon />
                     </IconButton>
+
                     <IconButton
                         className={clsx(classes.expand, {
                             [classes.expandOpen]: expanded,
@@ -123,19 +157,33 @@ export default function ImgMediaCard(props) {
                     >
                         <ExpandMoreIcon />
                     </IconButton>
+
                 </CardActions>
-                <Collapse in={expanded} timeout="auto" unmountOnExit>
+
+                <Collapse
+                    in={expanded}
+                    timeout="auto"
+                    unmountOnExit
+                >
                     <CardContent>
                         <Typography paragraph>
                             <b>Price:</b> {props.vacation.price} $
                         </Typography>
-                        <Divider className={classes.dividerStyle}/>
+
+                        <Divider
+                            className={classes.dividerStyle}
+                        />
+
                         <Typography paragraph>
                             {props.vacation.description}
                         </Typography>
+
                     </CardContent>
+
                 </Collapse>
+
             </Card>
+
         </Box >
     );
 }
