@@ -115,6 +115,7 @@ const loginUser = async (req, res) => {
     catch (err) {
         code = 500;
         response.err = 'Please try again later'
+        return res.status(code).json(response)
     }
 
     const match = await bcrypt.compare(user.password, mqRes[0][0].password)
@@ -157,10 +158,12 @@ const logOut = async (req, res) => {
 
     let response = {
         success: false
-    }
+    };
 
-    let refreshToken = req.body.token
-    if (!refreshToken) return res.status(400).json(response)
+    const cookies = req.cookies;
+    
+    if (!cookies['refresh-token'] && !cookies['access-token']) 
+        return res.status(400).json(response)
 
     const query =
         `DELETE
@@ -169,9 +172,11 @@ const logOut = async (req, res) => {
 
 
     try {
-        await pool.execute(query, [refreshToken])
+        if(cookies['refresh-token'])
+            await pool.execute(query, [cookies['refresh-token']])
+
         response.success = true
-        res.clearCookie('token').clearCookie('refresh-token').status(200).json(response)
+        res.clearCookie('refresh-token').clearCookie('access-token').status(200).json(response)
     }
     catch (err) {
         res.status(500).json(response)
