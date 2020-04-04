@@ -34,11 +34,11 @@ const users = async (req, res) => {
 
     try {
         let mqRes;
-        if(id)
+        if (id)
             mqRes = await pool.execute(query, [id])
         else
             mqRes = await pool.execute(query)
-        
+
         let data = mqRes[0];
 
         response.data = mapUserData(data);
@@ -118,8 +118,12 @@ const loginUser = async (req, res) => {
         return res.status(code).json(response)
     }
 
-    const match = await bcrypt.compare(user.password, mqRes[0][0].password)
-
+    let match;
+    try {
+        match = await bcrypt.compare(user.password, mqRes[0][0].password)
+    } catch (error) {
+        console.log(error)
+    }
     if (match) {
         let user = {
             email: mqRes[0][0].email,
@@ -161,8 +165,8 @@ const logOut = async (req, res) => {
     };
 
     const cookies = req.cookies;
-    
-    if (!cookies['refresh-token'] && !cookies['access-token']) 
+
+    if (!cookies['refresh-token'] && !cookies['access-token'])
         return res.status(400).json(response)
 
     const query =
@@ -172,7 +176,7 @@ const logOut = async (req, res) => {
 
 
     try {
-        if(cookies['refresh-token'])
+        if (cookies['refresh-token'])
             await pool.execute(query, [cookies['refresh-token']])
 
         response.success = true
@@ -183,6 +187,12 @@ const logOut = async (req, res) => {
     }
 }
 
+const logincheck = async (req, res) => {
+
+    const userType = req.user.type
+    res.status(200).json({ succes: true, userType: userType })
+
+}
 
 /*Access Token Generation*/
 const generateToken = async (user) => {
@@ -232,6 +242,7 @@ module.exports = {
     registerUser,
     loginUser,
     logOut,
+    logincheck,
 }
 
 
