@@ -5,6 +5,7 @@ import {
   Switch,
   Route,
 } from "react-router-dom";
+import Store from './store'
 
 /* Material-UI */
 import { Container, CssBaseline } from '@material-ui/core';
@@ -17,9 +18,9 @@ import Connect from './pages/Connect/Connect'
 import Navbar from './components/Nav/Nav'
 
 
-function App() {
+const App = () => {
   return (
-    <div className="App">
+    <Store>
       <CssBaseline />
       <Router>
 
@@ -30,16 +31,16 @@ function App() {
         <Container maxWidth="lg">
           <Switch>
 
-            <Route path="/Login" component={() => <Connect formType='login' />} />
-            <Route path="/Register" component={() => <Connect formType='register' />} />
+            <Route path="/Login" component={(props) => <Connect formType='login' {...props} /> } />
+            <Route path="/Register" component={(props) => <Connect formType='register' {...props}/>} />
 
-            <Route path="/" exact={true} component={Home} />
+            <Route path="/" component={Home} />
 
           </Switch>
         </Container>
 
       </Router>
-    </div>
+    </Store>
   );
 }
 

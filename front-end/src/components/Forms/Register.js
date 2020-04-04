@@ -1,18 +1,14 @@
-import React from 'react';
-import { Link, Redirect } from "react-router-dom";
-import { withStyles } from '@material-ui/core/styles';
+import React, { useEffect, useContext, useReducer } from 'react';
+import { Link, useHistory } from 'react-router-dom';
+import { makeStyles } from '@material-ui/core/styles';
 import { FormHelperText, Container, CssBaseline, TextField, Button, Grid, Typography } from '@material-ui/core';
+import { Context } from '../../store';
+import registerReducer from '../../reducers/registerReducer'
 import axios from 'axios'
 
 
 
-const styles = theme => ({
-
-    '@global': {
-        body: {
-            backgroundColor: theme.palette.common.white,
-        },
-    },
+const useStyles = makeStyles((theme) => ({
     paper: {
         marginTop: theme.spacing(8),
         display: 'flex',
@@ -30,193 +26,205 @@ const styles = theme => ({
     submit: {
         margin: theme.spacing(3, 0, 2),
     },
-});
+}));
 
-class Register extends React.Component {
+const Register = () => {
 
-    state = {
-        /* Any password/email validation/server errors */
-        validation: {
-            emailErr: false,
-            emailMsg: '',
-            passwordErr: false,
-            passwordMsg: '',
-        },
+    const classes = useStyles()
+    const history = useHistory()
 
-        /*For Server Error*/
-        err: false,
-
-        /* Form values stored in the State */
+    const initialState = {
         email: '',
         password: '',
         password2: '',
+        isLoading: false,
 
-        /* Redirct to different routes */
-        redirect: null,
-    }
+        errorEmail: false,
+        errorPassword: false,
+        errorEmailMsg: '',
+        errorPasswordMsg: '',
 
-    /* Handles input changes */
-    handleChange = (e) => {
-        e.preventDefault();
-        this.setState({ [e.target.name]: e.target.value })
-    }
+        errorServer: false,
+    };
+
+    const [registerState, registerDispatch] = useReducer(registerReducer, initialState);
+    const [globalState, globalDispatch] = useContext(Context)
+
+    useEffect(() => {
+        axios.get('http://localhost:8000/users/check', {
+            withCredentials: true,
+            credentials: 'include',
+        })
+            .then(response => {
+                globalDispatch({ type: 'SET_LOGGED_IN', payload: response.data.userType });
+                history.push('/')
+            })
+            .catch(error => {
+                globalDispatch({ type: 'SET_LOGGED_OUT' });
+            });
+    }, [globalDispatch, history]);
 
     /* Handles form submit */
-    handleSubmit = (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
-        let validation = this.validateData();
+
+        let validation = validateData();
         if (!validation) return false
 
+        registerDispatch({ type: 'SET_LOADING' })
+
         axios.post('http://localhost:8000/users', {
-            email: this.state.email,
-            password: this.state.password,
+            email: registerState.email,
+            password: registerState.password,
         })
             .then((response) => {
-                console.log(response);
+                registerDispatch({ type: 'REGISTER_SUCCESS' });
+                history.push('/login')
             })
             .catch((error) => {
-                let err = false;
-                let dupErr = false;
-                let dupMsg = ''
+                let errorEmail = false;
+                let errorEmailMsg = '';
+                let errorServer = false;
+
                 if (error.response.status >= 500 && error.response.status < 600)
-                    err = true
+                    errorServer = true;
 
                 if (error.response.status === 409) {
-                    dupErr = true
-                    dupMsg = 'Email is already in use'
+                    errorEmail = true;
+                    errorEmailMsg = 'Email is already registered'
                 }
 
-                this.setState({
-                    validation: {
-                        emailErr: dupErr,
-                        emailMsg: dupMsg,
-                    },
-                    err,
-                })
-                console.log(error.response.status);
+                if (errorEmail || errorServer)
+                    registerDispatch({ type: 'SET_ERROR', payload: { errorEmail, errorEmailMsg, errorServer } })
+
             });
     }
 
     /* Validates stored values */
-    validateData = (e) => {
-        let passwordErr = false;
-        let emailErr = false;
-        let passwordMsg = '';
-        let emailMsg = '';
+    const validateData = (e) => {
+        let errorEmail = false;
+        let errorPassword = false;
+        let errorEmailMsg = '';
+        let errorPasswordMsg = '';
 
-        const regexp = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        const regexp = /^(([^<>()[\]\\.,;:\s@']+(\.[^<>()[\]\\.,;:\s@']+)*)|('.+'))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
-        if (this.state.password !== this.state.password2) {
-            passwordErr = true;
-            passwordMsg = 'Both passwords must match';
+        if (registerState.password !== registerState.password2) {
+            errorPassword = true;
+            errorPasswordMsg = 'Both passwords must match';
         }
 
-        if (this.state.password.length < 6) {
-            passwordErr = true;
-            passwordMsg = 'Password must be more then 6 characters';
+        if (registerState.password.length < 6) {
+            errorPassword = true;
+            errorPasswordMsg = 'Password must be more then 6 characters';
         }
 
-        if (!regexp.test(this.state.email)) {
-            emailErr = true;
-            emailMsg = 'Invalid email address';
+        if (!regexp.test(registerState.email)) {
+            errorEmail = true;
+            errorEmailMsg = 'Invalid email address';
         }
 
-
-        this.setState(
-            {
-                validation: {
-                    passwordErr,
-                    emailErr,
-                    passwordMsg,
-                    emailMsg,
-                }
-            }, _ => {
-                console.log(this.state)
-            })
-
-
-        if (passwordErr || emailErr) return false
+        registerDispatch({ type: 'SET_ERROR', payload: { errorEmail, errorPassword, errorEmailMsg, errorPasswordMsg } })
+        if (errorEmail || errorPassword) return false
         else return true
     }
 
-    render() {
-        if (this.state.redirect) {
-            return <Redirect to={this.state.redirect} />
-        }
-        const { classes } = this.props;
-
-        return (
-            <Container component="main" maxWidth="xs">
+    return (
+        !globalState.userStatus.userCheckedIn ? '' :
+            <Container component='main' maxWidth='xs'>
                 <CssBaseline />
                 <div className={classes.paper}>
-                    <Typography component="h1" variant="h5">
+                    <Typography component='h1' variant='h5'>
                         Register
                     </Typography>
-                    <form className={classes.form} noValidate onSubmit={this.handleSubmit}>
+                    <form className={classes.form} noValidate onSubmit={handleSubmit}>
                         <TextField
-                            error={this.state.validation.emailErr}
-                            helperText={this.state.validation.emailMsg}
-                            variant="outlined"
-                            margin="normal"
+                            error={registerState.errorEmail}
+                            helperText={registerState.errorEmailMsg}
+                            variant='outlined'
+                            margin='normal'
                             required
                             fullWidth
-                            id="email"
-                            label="Email Address"
-                            name="email"
-                            autoComplete="email"
+                            id='email'
+                            label='Email Address'
+                            name='email'
                             autoFocus
-                            onChange={this.handleChange}
-                        />
-                        {/* <FormHelperText error="true"  */}
-                        <TextField
-                            error={this.state.validation.passwordErr}
-                            helperText={this.state.validation.passwordMsg}
-                            variant="outlined"
-                            margin="normal"
-                            required
-                            fullWidth
-                            name="password"
-                            label="Password"
-                            type="password"
-                            id="password"
-                            onChange={this.handleChange}
+                            autoComplete='new-email'
+                            value={registerState.email}
+                            onChange={e =>
+                                registerDispatch({
+                                    type: 'SET_FIELD',
+                                    fieldName: 'email',
+                                    payload: e.currentTarget.value,
+                                })
+                            }
                         />
                         <TextField
-                            error={this.state.validation.passwordErr}
-                            variant="outlined"
-                            margin="normal"
+                            error={registerState.errorPassword}
+                            helperText={registerState.errorPasswordMsg}
+                            variant='outlined'
+                            margin='normal'
                             required
                             fullWidth
-                            name="password2"
-                            label="Repeat Password"
-                            type="password"
-                            id="password2"
-                            onChange={this.handleChange}
+                            name='password'
+                            label='Password'
+                            type='password'
+                            id='password'
+                            autoComplete='new-password'
+                            value={registerState.password}
+                            onChange={e =>
+                                registerDispatch({
+                                    type: 'SET_FIELD',
+                                    fieldName: 'password',
+                                    payload: e.currentTarget.value,
+                                })
+                            }
                         />
-                        {this.state.err && <FormHelperText error>Please try again later</FormHelperText>}
+                        <TextField
+                            error={registerState.errorPassword}
+                            variant='outlined'
+                            margin='normal'
+                            required
+                            fullWidth
+                            name='password2'
+                            label='Repeat Password'
+                            type='password'
+                            id='password2'
+                            autoComplete='off'
+                            value={registerState.passowrd2}
+                            onChange={e =>
+                                registerDispatch({
+                                    type: 'SET_FIELD',
+                                    fieldName: 'password2',
+                                    payload: e.currentTarget.value,
+                                })
+                            }
+                        />
+                        {registerState.errorServer && <FormHelperText error>Please try again later</FormHelperText>}
                         <Button
-                            type="submit"
+                            type='submit'
                             fullWidth
-                            variant="contained"
-                            color="primary"
+                            variant='contained'
+                            color='primary'
                             className={classes.submit}
+                            disabled={registerState.isLoading}
                         >
                             Sign Up
                         </Button>
                         <Grid container>
                             <Grid item>
-                                <Link to="/login" variant="body2">
-                                    {"Have an account? Sign In"}
+                                <Link to='/login' variant='body2'>
+                                    {'Have an account? Sign In'}
                                 </Link>
                             </Grid>
                         </Grid>
                     </form>
                 </div>
             </Container>
-        );
-    }
+    );
+
 }
 
 
 
-export default withStyles(styles)(Register)
+export default Register

@@ -1,17 +1,13 @@
-import React from 'react';
-import { Link, Redirect } from "react-router-dom";
-import { withStyles } from '@material-ui/core/styles';
+import React, { useEffect, useContext, useReducer } from 'react';
+import { Link, useHistory } from "react-router-dom";
+import { makeStyles } from '@material-ui/core/styles';
 import { FormHelperText, Container, CssBaseline, TextField, Button, Grid, Typography } from '@material-ui/core';
+import { Context } from '../../store';
+import loginReducer from '../../reducers/loginReducer'
 import axios from 'axios'
 
 
-const styles = theme => ({
-
-    '@global': {
-        body: {
-            backgroundColor: theme.palette.common.white,
-        },
-    },
+const useStyles = makeStyles((theme) => ({
     paper: {
         marginTop: theme.spacing(8),
         display: 'flex',
@@ -29,42 +25,57 @@ const styles = theme => ({
     submit: {
         margin: theme.spacing(3, 0, 2),
     },
-});
+}));
 
 
 
-class Login extends React.Component {
-    state = {
-        /* Any password/email validation/server errors */
-        validation: {
-            loginErr: false,
-            loginMsg: '',
-        },
+const Login = () => {
+    const classes = useStyles()
+    const history = useHistory()
 
-        /*For Server Error*/
-        err: false,
-
-        /* Form values stored in the State */
+    const initialState = {
         email: '',
         password: '',
+        isLoading: false,
+        error: false,
+        errorType: '',
+        errorMsg: '',
+    };
 
-        /* Redirct to different routes */
-        redirect: null,
-    }
+    const [loginState, loginDispatch] = useReducer(loginReducer, initialState);
+    const [globalState, globalDispatch] = useContext(Context)
 
-    /* Handles input changes */
-    handleChange = (e) => {
-        e.preventDefault();
-        this.setState({ [e.target.name]: e.target.value })
-    }
+    useEffect(() => {
+        axios.get('http://localhost:8000/users/check', {
+            withCredentials: true,
+            credentials: 'include',
+        })
+            .then(response => {
+                globalDispatch({ type: 'SET_LOGGED_IN', payload: response.data.userType });
+                history.push('/')
+            })
+            .catch(error => {
+                globalDispatch({ type: 'SET_LOGGED_OUT' });
+            });
+    }, [globalDispatch, history]);
 
     /* Handles form submit */
-    handleSubmit = (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
 
+        const regexp = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+        if (!regexp.test(loginState.email))
+            return loginDispatch({ type: 'SET_ERROR', payload: { errorType: 'email', errorMsg: 'Enter a valid email' } })
+
+        if (loginState.password.length < 6)
+            return loginDispatch({ type: 'SET_ERROR', payload: { errorType: 'password', errorMsg: 'Password must be 6 characters or more' } })
+
+        loginDispatch({ type: 'SET_LOADING' });
+
         axios.post('http://localhost:8000/users/login', {
-            email: this.state.email,
-            password: this.state.password,
+            email: loginState.email,
+            password: loginState.password,
         }, {
             withCredentials: true,
             credentials: 'include',
@@ -74,102 +85,112 @@ class Login extends React.Component {
             },
         })
             .then((response) => {
-                this.setState({ redirect: '/home' })
+                loginDispatch({ type: 'LOGIN_SUCCESS' });
+                history.push('/')
             })
             .catch((error) => {
-                let err = false;
-                let loginErr = false;
-                let loginMsg = ''
+                let errorType = false;
+                let errorMsg = ''
 
-                console.log(error.response)
                 if (!error.response)
-                    err = true  
+                    errorType = 'server'
                 else if (error.response.status >= 500 && error.response.status < 600)
-                    err = true
+                    errorType = 'server'
                 else if (error.response.status === 401) {
-                    loginErr = true
-                    loginMsg = 'Email or Password is incorrect'
+                    errorType = 'email'
+                    errorMsg = 'Email or Password is incorrect'
                 }
-
-                this.setState({
-                    validation: {
-                        loginErr,
-                        loginMsg,
-                    },
-                    err,
-                })
+                if (errorType)
+                    loginDispatch({ type: 'SET_ERROR', payload: { errorType, errorMsg } })
             });
     }
 
-    render() {
-        if (this.state.redirect) {
-            return <Redirect to={this.state.redirect} />
-        }
-        const { classes } = this.props;
-        return (
-            <Container component="main" maxWidth="xs">
-                <CssBaseline />
-                <div className={classes.paper}>
-                    <Typography component="h1" variant="h5">
-                        Sign in
+    return (
+        /* Checks if user did the initial check in to prevent premature render */
+        !globalState.userStatus.userCheckedIn ? '' : 
+
+        <Container component="main" maxWidth="xs">
+            <CssBaseline />
+            <div className={classes.paper}>
+                <Typography component="h1" variant="h5">
+                    Sign in
                     </Typography>
-                    <form className={classes.form} noValidate onSubmit={this.handleSubmit}>
-                        <TextField
-                            error={this.state.validation.loginErr}
-                            helperText={this.state.validation.loginMsg}
-                            variant="outlined"
-                            margin="normal"
-                            required
-                            fullWidth
-                            id="email"
-                            label="Email Address"
-                            name="email"
-                            autoComplete="email"
-                            autoFocus
-                            onChange={this.handleChange}
-                        />
-                        <TextField
-                            error={this.state.validation.loginErr}
-                            variant="outlined"
-                            margin="normal"
-                            required
-                            fullWidth
-                            name="password"
-                            label="Password"
-                            type="password"
-                            id="password"
-                            autoComplete="current-password"
-                            onChange={this.handleChange}
-                        />
-                        {this.state.err && <FormHelperText error>Please try again later</FormHelperText>}
-                        <Button
-                            type="submit"
-                            fullWidth
-                            variant="contained"
-                            color="primary"
-                            className={classes.submit}
-                        >
-                            Sign In
+                <form className={classes.form} noValidate onSubmit={handleSubmit}>
+                    <TextField
+                        error={loginState.error}
+                        helperText={loginState.errorType === 'email' && loginState.errorMsg}
+                        variant="outlined"
+                        margin="normal"
+                        required
+                        fullWidth
+                        id="email"
+                        label="Email Address"
+                        name="email"
+                        autoComplete="email"
+                        autoFocus
+                        value={loginState.email}
+                        onChange={e =>
+                            loginDispatch({
+                                type: 'SET_FIELD',
+                                fieldName: 'email',
+                                payload: e.currentTarget.value,
+                            })
+                        }
+                    />
+                    <TextField
+                        error={loginState.error}
+                        helperText={loginState.errorType === 'password' && loginState.errorMsg}
+                        variant="outlined"
+                        margin="normal"
+                        required
+                        fullWidth
+                        name="password"
+                        label="Password"
+                        type="password"
+                        id="password"
+                        autoComplete="current-password"
+                        value={loginState.password}
+                        onChange={e =>
+                            loginDispatch({
+                                type: 'SET_FIELD',
+                                fieldName: 'password',
+                                payload: e.currentTarget.value,
+                            })
+                        }
+                    />
+                    {loginState.errorType === 'server' && <FormHelperText error>Please try again later</FormHelperText>}
+                    <Button
+                        type="submit"
+                        fullWidth
+                        variant="contained"
+                        color="primary"
+                        className={classes.submit}
+                        disabled={loginState.isLoading}
+                    >
+                        Sign In
                         </Button>
-                        <Grid container>
-                            <Grid item xs>
-                                <Link to="" variant="body2">
-                                    Forgot password?
-                                </Link>
-                            </Grid>
-                            <Grid item>
-                                <Link to="/register" variant="body2">
-                                    {"Don't have an account? Sign Up"}
-                                </Link>
-                            </Grid>
+                    <Grid container>
+
+                        <Grid item xs>
+                            <Link to="" variant="body2">
+                                Forgot password?
+                            </Link>
                         </Grid>
-                    </form>
-                </div>
-            </Container>
-        );
-    }
+
+                        <Grid item>
+                            <Link to="/register" variant="body2">
+                                {"Don't have an account? Sign Up"}
+                            </Link>
+                        </Grid>
+
+                    </Grid>
+                </form>
+            </div>
+        </Container>
+    );
+
 }
 
 
 
-export default withStyles(styles)(Login)
+export default Login

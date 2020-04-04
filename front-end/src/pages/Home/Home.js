@@ -1,45 +1,40 @@
-import React from 'react';
+import React, { useEffect, useContext } from 'react';
+import { Context } from '../../store';
+import { useHistory } from 'react-router-dom';
+import axios from 'axios';
+import VacationWrapper from '../../components/Vacations/VacationWrapper';
+
 import './Home.css';
-import VacationCard from '../../components/Vacations/VacationCard'
-import { Box } from '@material-ui/core';
-import axios from 'axios'
 
 
-class Home extends React.Component {
 
-    state = {
-        data: [],
-    }
-    componentDidMount() {
-        axios.get('http://localhost:8000/vacations', {
-            email: this.state.email,
-            password: this.state.password,
-        }, {
+const Home = () => {
+
+    const [state, dispatch] = useContext(Context);
+    const history = useHistory()
+
+    useEffect(() => {
+        axios.get('http://localhost:8000/users/check', {
             withCredentials: true,
             credentials: 'include',
         })
-            .then((response) => {
-                this.setState({ data: response.data.data })
+            .then(response => {
+                dispatch({ type: 'SET_LOGGED_IN', payload: response.data.userType });
             })
-            .catch((error) => {
-
+            .catch(error => {
+                dispatch({ type: 'SET_LOGGED_OUT' });
+                history.push('/login')
             });
-    }
+    }, [dispatch, history]);
 
-    render() {
-        let vacationsArr = this.state.data;
-        let vacationCards = vacationsArr.map(item => {
-            return <VacationCard vacation={item} key={item.id} />
-        })
+    let landingPage = state.userStatus.isLoggedIn ? <VacationWrapper /> : '';
 
-        return (
-            <div className='home-p'>
-                <Box display="flex" justifyContent="center">
-                    {vacationCards}
-                </Box>
-            </div >
-        )
-    }
+    return (
+        <div>
+            {landingPage}
+        </div>
+    )
 }
+
 
 export default Home

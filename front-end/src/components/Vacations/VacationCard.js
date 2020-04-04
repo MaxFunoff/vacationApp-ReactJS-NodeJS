@@ -52,8 +52,8 @@ const useStyles = makeStyles((theme) => ({
     },
     paperStyle: {
         marginBottom: '1rem',
-        backgroundColor: '#424242',
-        color: '#c8e6c9'
+        backgroundColor: '#3f51b5',
+        color: '#fff'
     },
     dateTypograhpyStlye: {
         fontWeight: '500',
@@ -67,7 +67,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-export default function ImgMediaCard(props) {
+const VacationCard = (props) =>{
     let endDate = new Date(Date.parse(props.vacation.EndDate))
     endDate = endDate.toLocaleString('default', { month: 'long', day: 'numeric', year: 'numeric' });
 
@@ -167,7 +167,7 @@ export default function ImgMediaCard(props) {
                 >
                     <CardContent>
                         <Typography paragraph>
-                            <b>Price:</b> {props.vacation.price} $
+                            <b>Starting at</b> {props.vacation.price} $
                         </Typography>
 
                         <Divider
@@ -187,4 +187,6 @@ export default function ImgMediaCard(props) {
         </Box >
     );
 }
+
+export default VacationCard
 
