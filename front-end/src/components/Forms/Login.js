@@ -46,18 +46,22 @@ const Login = () => {
     const [globalState, globalDispatch] = useContext(Context)
 
     useEffect(() => {
-        axios.get('http://localhost:8000/users/check', {
-            withCredentials: true,
-            credentials: 'include',
-        })
-            .then(response => {
-                globalDispatch({ type: 'SET_LOGGED_IN', payload: response.data.userType });
-                history.push('/')
+        if (!globalState.userStatus.userCheckedIn) {
+            axios.get('http://localhost:8000/users/check', {
+                withCredentials: true,
+                credentials: 'include',
             })
-            .catch(error => {
-                globalDispatch({ type: 'SET_LOGGED_OUT' });
-            });
-    }, [globalDispatch, history]);
+                .then(response => {
+                    globalDispatch({ type: 'SET_LOGGED_IN', payload: response.data.userType });
+                    history.push('/')
+                })
+                .catch(error => {
+                    globalDispatch({ type: 'SET_LOGGED_OUT' });
+                });
+        } else if (globalState.userStatus.isLoggedIn)
+            history.push('/')
+    }, [globalDispatch, history, globalState.userStatus.userCheckedIn, globalState.userStatus.isLoggedIn]);
+
 
     /* Handles form submit */
     const handleSubmit = (e) => {
@@ -85,7 +89,9 @@ const Login = () => {
             },
         })
             .then((response) => {
+                console.log(response)
                 loginDispatch({ type: 'LOGIN_SUCCESS' });
+                globalDispatch({ type: 'SET_LOGGED_IN', payload: response.data.data.type })
                 history.push('/')
             })
             .catch((error) => {
@@ -107,86 +113,86 @@ const Login = () => {
 
     return (
         /* Checks if user did the initial check in to prevent premature render */
-        !globalState.userStatus.userCheckedIn ? '' : 
+        !globalState.userStatus.userCheckedIn ? '' :
 
-        <Container component="main" maxWidth="xs">
-            <CssBaseline />
-            <div className={classes.paper}>
-                <Typography component="h1" variant="h5">
-                    Sign in
+            <Container component="main" maxWidth="xs">
+                <CssBaseline />
+                <div className={classes.paper}>
+                    <Typography component="h1" variant="h5">
+                        Sign in
                     </Typography>
-                <form className={classes.form} noValidate onSubmit={handleSubmit}>
-                    <TextField
-                        error={loginState.error}
-                        helperText={loginState.errorType === 'email' && loginState.errorMsg}
-                        variant="outlined"
-                        margin="normal"
-                        required
-                        fullWidth
-                        id="email"
-                        label="Email Address"
-                        name="email"
-                        autoComplete="email"
-                        autoFocus
-                        value={loginState.email}
-                        onChange={e =>
-                            loginDispatch({
-                                type: 'SET_FIELD',
-                                fieldName: 'email',
-                                payload: e.currentTarget.value,
-                            })
-                        }
-                    />
-                    <TextField
-                        error={loginState.error}
-                        helperText={loginState.errorType === 'password' && loginState.errorMsg}
-                        variant="outlined"
-                        margin="normal"
-                        required
-                        fullWidth
-                        name="password"
-                        label="Password"
-                        type="password"
-                        id="password"
-                        autoComplete="current-password"
-                        value={loginState.password}
-                        onChange={e =>
-                            loginDispatch({
-                                type: 'SET_FIELD',
-                                fieldName: 'password',
-                                payload: e.currentTarget.value,
-                            })
-                        }
-                    />
-                    {loginState.errorType === 'server' && <FormHelperText error>Please try again later</FormHelperText>}
-                    <Button
-                        type="submit"
-                        fullWidth
-                        variant="contained"
-                        color="primary"
-                        className={classes.submit}
-                        disabled={loginState.isLoading}
-                    >
-                        Sign In
+                    <form className={classes.form} noValidate onSubmit={handleSubmit}>
+                        <TextField
+                            error={loginState.error}
+                            helperText={loginState.errorType === 'email' && loginState.errorMsg}
+                            variant="outlined"
+                            margin="normal"
+                            required
+                            fullWidth
+                            id="email"
+                            label="Email Address"
+                            name="email"
+                            autoComplete="email"
+                            autoFocus
+                            value={loginState.email}
+                            onChange={e =>
+                                loginDispatch({
+                                    type: 'SET_FIELD',
+                                    fieldName: 'email',
+                                    payload: e.currentTarget.value,
+                                })
+                            }
+                        />
+                        <TextField
+                            error={loginState.error}
+                            helperText={loginState.errorType === 'password' && loginState.errorMsg}
+                            variant="outlined"
+                            margin="normal"
+                            required
+                            fullWidth
+                            name="password"
+                            label="Password"
+                            type="password"
+                            id="password"
+                            autoComplete="current-password"
+                            value={loginState.password}
+                            onChange={e =>
+                                loginDispatch({
+                                    type: 'SET_FIELD',
+                                    fieldName: 'password',
+                                    payload: e.currentTarget.value,
+                                })
+                            }
+                        />
+                        {loginState.errorType === 'server' && <FormHelperText error>Please try again later</FormHelperText>}
+                        <Button
+                            type="submit"
+                            fullWidth
+                            variant="contained"
+                            color="primary"
+                            className={classes.submit}
+                            disabled={loginState.isLoading}
+                        >
+                            Sign In
                         </Button>
-                    <Grid container>
+                        <Grid container>
 
-                        <Grid item xs>
-                            <Link to="" variant="body2">
-                                Forgot password?
+                            <Grid item xs>
+                                <Link to="" variant="body2">
+                                    Forgot password?
                             </Link>
-                        </Grid>
+                            </Grid>
 
-                        <Grid item>
-                            <Link to="/register" variant="body2">
-                                {"Don't have an account? Sign Up"}
-                            </Link>
-                        </Grid>
+                            <Grid item>
+                                <Link to="/register" variant="body2">
+                                    {"Don't have an account? Sign Up"}
+                                </Link>
+                            </Grid>
 
-                    </Grid>
-                </form>
-            </div>
-        </Container>
+                        </Grid>
+                    </form>
+                </div>
+            </Container>
     );
 
 }

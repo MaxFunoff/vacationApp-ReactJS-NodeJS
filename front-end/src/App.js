@@ -21,18 +21,16 @@ import Navbar from './components/Nav/Nav'
 const App = () => {
   return (
     <Store>
-      <CssBaseline />
       <Router>
-
         <nav>
           <Navbar />
         </nav>
-
+        <CssBaseline />
         <Container maxWidth="lg">
           <Switch>
 
-            <Route path="/Login" component={(props) => <Connect formType='login' {...props} /> } />
-            <Route path="/Register" component={(props) => <Connect formType='register' {...props}/>} />
+            <Route path="/Login" component={(props) => <Connect formType='login' {...props} />} />
+            <Route path="/Register" component={(props) => <Connect formType='register' {...props} />} />
 
             <Route path="/" component={Home} />
 

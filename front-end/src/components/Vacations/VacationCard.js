@@ -107,9 +107,7 @@ const VacationCard = (props) =>{
                                 variant="h6"
                                 component="h1"
                             >
-
                                 {startDate} - {endDate}
-
                             </Typography>
                         </Box>
                     </Paper>
@@ -170,20 +168,14 @@ const VacationCard = (props) =>{
                             <b>Starting at</b> {props.vacation.price} $
                         </Typography>
 
-                        <Divider
-                            className={classes.dividerStyle}
-                        />
+                        <Divider className={classes.dividerStyle} />
 
                         <Typography paragraph>
                             {props.vacation.description}
                         </Typography>
-
                     </CardContent>
-
                 </Collapse>
-
             </Card>
-
         </Box >
     );
 }

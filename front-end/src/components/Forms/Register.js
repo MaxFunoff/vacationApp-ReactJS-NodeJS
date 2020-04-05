@@ -51,18 +51,21 @@ const Register = () => {
     const [globalState, globalDispatch] = useContext(Context)
 
     useEffect(() => {
-        axios.get('http://localhost:8000/users/check', {
-            withCredentials: true,
-            credentials: 'include',
-        })
-            .then(response => {
-                globalDispatch({ type: 'SET_LOGGED_IN', payload: response.data.userType });
-                history.push('/')
+        if (!globalState.userStatus.userCheckedIn) {
+            axios.get('http://localhost:8000/users/check', {
+                withCredentials: true,
+                credentials: 'include',
             })
-            .catch(error => {
-                globalDispatch({ type: 'SET_LOGGED_OUT' });
-            });
-    }, [globalDispatch, history]);
+                .then(response => {
+                    globalDispatch({ type: 'SET_LOGGED_IN', payload: response.data.userType });
+                    history.push('/')
+                })
+                .catch(error => {
+                    globalDispatch({ type: 'SET_LOGGED_OUT' });
+                });
+        } else if (globalState.userStatus.isLoggedIn)
+            history.push('/')
+    }, [globalDispatch, history, globalState.userStatus.userCheckedIn, globalState.userStatus.isLoggedIn]);
 
     /* Handles form submit */
     const handleSubmit = (e) => {
@@ -130,7 +133,7 @@ const Register = () => {
     }
 
     return (
-        !globalState.userStatus.userCheckedIn ? '' :
+        !globalState.userStatus.userCheckedIn || globalState.userStatus.isLoggedIn ? '' :
             <Container component='main' maxWidth='xs'>
                 <CssBaseline />
                 <div className={classes.paper}>
