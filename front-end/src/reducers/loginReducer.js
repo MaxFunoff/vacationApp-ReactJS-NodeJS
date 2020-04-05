@@ -25,6 +25,7 @@ const Reducer = (state, action) => {
                 errorType: action.payload.errorType,
                 errorMsg: action.payload.errorMsg,
 
+                isLoading: false,
             };
         }
         case 'LOGIN_SUCCESS': {

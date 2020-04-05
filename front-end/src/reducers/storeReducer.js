@@ -17,6 +17,10 @@ const Reducer = (state, action) => {
                     userType: null,
                     userCheckedIn: true,
                 },
+                vacationsStatus: {
+                    data: [],
+                    error: null,
+                }
             };
         case 'SET_ERROR':
             return {
