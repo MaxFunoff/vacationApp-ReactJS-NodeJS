@@ -3,25 +3,15 @@ import './Connect.css';
 import Login from '../../components/Forms/Login'
 import Register from '../../components/Forms/Register'
 
-class Connect extends React.Component {
+const Connect = (props) => {
 
-    constructor(props){
-        super(props)
-        this.state.formType = props.formType
-    }
+    return (
+        <div className='login-p'>
+            {props.formType === 'login' && <Login />}
+            {props.formType === 'register' && <Register />}
+        </div>
+    )
 
-    state = {
-        formType: ''
-    }
-
-    render() {
-        return (
-            <div className='login-p'>
-                {this.state.formType === 'login' && <Login />}
-                {this.state.formType === 'register' && <Register />}
-            </div>
-        )
-    }
 }
 
 export default Connect

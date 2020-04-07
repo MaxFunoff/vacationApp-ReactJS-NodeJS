@@ -14,7 +14,7 @@ import { Container, CssBaseline } from '@material-ui/core';
 import Home from './pages/Home/Home'
 import Connect from './pages/Connect/Connect'
 
-/*Componenets*/
+/* Componenets */
 import Navbar from './components/Nav/Nav'
 
 
