@@ -115,7 +115,7 @@ const Login = () => {
         /* Checks if user did the initial check in to prevent premature render */
         !globalState.userStatus.userCheckedIn ? '' :
 
-            <Container component="main" maxWidth="xs">
+            <Container component="div" maxWidth="xs">
                 <CssBaseline />
                 <div className={classes.paper}>
                     <Typography component="h1" variant="h5">

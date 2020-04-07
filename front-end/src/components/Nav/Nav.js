@@ -19,7 +19,9 @@ import ListAltIcon from '@material-ui/icons/ListAlt';
 import AddShoppingCartIcon from '@material-ui/icons/AddShoppingCart';
 import GroupIcon from '@material-ui/icons/Group';
 
+import logoText from '../../images/ivacation-onlytext.png'
 import axios from 'axios'
+
 import './Nav.css';
 
 
@@ -80,8 +82,28 @@ const useStyles = makeStyles((theme) => ({
         alignItems: 'center',
         justifyContent: 'flex-end',
         padding: theme.spacing(0, 1),
-        // necessary for content to be below app bar
         ...theme.mixins.toolbar,
+    },
+    topName: {
+        display: 'flex',
+        margin: '0 auto',
+    },
+    topNameOpen: {
+        transition: theme.transitions.create('width', {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.enteringScreen,
+        }),
+        width: 200,
+        overflowX: 'hidden',
+    },
+    topNameClose: {
+        transition: theme.transitions.create('width', {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
+        }),
+        width: 0,
+        
+        overflowX: 'hidden',
     },
     content: {
         flexGrow: 1,
@@ -129,7 +151,7 @@ const Nav = () => {
 
     return (
         !state.userStatus.isLoggedIn || !state.userStatus.userCheckedIn ? '' :
-            <div className={classes.root}>
+            <nav className={classes.root}>
                 <CssBaseline />
                 <Drawer
                     variant="permanent"
@@ -145,6 +167,10 @@ const Nav = () => {
                     }}
                 >
                     <div className={classes.toolbar}>
+                        <img src={logoText} alt='company name' className={clsx(classes.topName, {
+                            [classes.topNameOpen]: open,
+                            [classes.topNameClose]: !open,
+                        })}/>   
                         <IconButton onClick={open ? handleDrawerClose : handleDrawerOpen}>
                             {open ? <ChevronLeftIcon /> : <ChevronRightIcon />}
                         </IconButton>
@@ -168,7 +194,7 @@ const Nav = () => {
                     </List>
                     <Divider />
                     {state.userStatus.userType !== 'admin' ? '' :
-                        <List>
+                        <List style={{ color: '#e53935' }}>
                             <ListItem button name='statistics' onClick={handleNavClick}>
                                 <ListItemIcon><InsertChartIcon /></ListItemIcon>
                                 <ListItemText primary='Statistics' />
@@ -203,7 +229,7 @@ const Nav = () => {
                         </ListItem>
                     </List>
                 </Drawer>
-            </div>
+            </nav>
     );
 
 }

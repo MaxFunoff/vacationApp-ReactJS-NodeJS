@@ -1,14 +1,25 @@
 import React from 'react';
-import './Connect.css';
 import Login from '../../components/Forms/Login'
 import Register from '../../components/Forms/Register'
+import { Grid } from '@material-ui/core'
+import mainLogo from '../../images/ivacation.png'
+import './Connect.css';
 
 const Connect = (props) => {
-
     return (
         <div className='login-p'>
-            {props.formType === 'login' && <Login />}
-            {props.formType === 'register' && <Register />}
+            <Grid
+                container
+                spacing={0}
+                direction="column"
+                alignItems="center"
+                justify="center"
+                style={{ minHeight: '80vh' }}
+            >
+                <img className='logo-img' src={mainLogo} alt='site logo'/>
+                {props.formType === 'login' && <Login />}
+                {props.formType === 'register' && <Register />}
+            </Grid>
         </div>
     )
 

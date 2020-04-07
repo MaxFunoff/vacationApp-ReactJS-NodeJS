@@ -22,11 +22,11 @@ const App = () => {
   return (
     <Store>
       <Router>
-        <nav>
-          <Navbar />
-        </nav>
+
+        <Navbar />
+
         <CssBaseline />
-        <Container maxWidth="lg">
+        <Container component='main' maxWidth="lg">
           <Switch>
 
             <Route path="/Login" component={(props) => <Connect formType='login' {...props} />} />
