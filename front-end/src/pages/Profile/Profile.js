@@ -3,10 +3,7 @@ import { Context } from '../../store';
 import { useHistory } from 'react-router-dom';
 import { Grid } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles';
-import VacationWrapper from '../../components/Vacations/VacationWrapper';
 import axios from 'axios'
-import mainLogo from '../../images/ivacation-text.png'
-import './Home.css';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -16,7 +13,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const Home = () => {
+const Profile = () => {
 
     const classes = useStyles();
     const [state, dispatch] = useContext(Context);
@@ -42,22 +39,12 @@ const Home = () => {
 
 
     return (
-        !state.userStatus.isLoggedIn || !state.userStatus.userCheckedIn ? '' :
+        !state.userStatus.isLoggedIn || !state.userStatus.userType || !state.userStatus.userCheckedIn ? '' :
             <div className='home-p'>
-                <Grid
-                    container
-                    spacing={0}
-                    direction="column"
-                    alignItems="center"
-                    justify="center"
-                    style={{ minHeight: '10vh' }}
-                >
-                    <img className={classes.logoImg} src={mainLogo} alt='site logo' />
-                    <VacationWrapper />
-                </Grid>
+               im the profile page
             </div>
     )
 }
 
 
-export default Home
+export default Profile

@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import clsx from 'clsx';
 import './VacationCard.css';
+import { Context } from '../../store';
 
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -23,6 +24,9 @@ import IconButton from '@material-ui/core/IconButton';
 import ShareIcon from '@material-ui/icons/Share';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import AddIcon from '@material-ui/icons/Add';
+import CheckIcon from '@material-ui/icons/Check';
+
+import axios from 'axios';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -67,7 +71,9 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-const VacationCard = (props) =>{
+const VacationCard = (props) => {
+    const [state, dispatch] = useContext(Context);
+
     let endDate = new Date(Date.parse(props.vacation.EndDate))
     endDate = endDate.toLocaleString('default', { month: 'long', day: 'numeric', year: 'numeric' });
 
@@ -80,103 +86,125 @@ const VacationCard = (props) =>{
         setExpanded(!expanded);
     };
 
-    const handleAddClick = () => {
-        console.log('Add Clicked')
+    const handleAddClick = (e) => {
+        e.preventDefault();
+        
+        axios.post('http://localhost:8000/vacations/' + props.vacation.id + '/add', {}, {
+            withCredentials: true,
+            credentials: 'include',
+        })
+            .then((response) => {
+                dispatch({type: 'ADD_VACATION_TO_USER', payload: props.vacation})
+            })
+            .catch((error) => {
+            });
     }
 
+    const userHasVacation = () => {
+        const vacationIndex = state.userStatus.userVacations.findIndex(vacation => vacation.id === props.vacation.id)
+        if (vacationIndex !== -1) return true
+        else return false
+    }
 
     return (
-        <Box
-            m={2}
-            display="flex"
-            alignSelf='flex-start'
-        >
-            <Card
-                className={classes.cardStyle}
+        !state.userStatus.userType ? '' :
+            <Box
+                m={2}
+                display="flex"
+                alignSelf='flex-start'
             >
-                <CardActionArea>
-                    <Paper
-                        className={classes.paperStyle}
-                    >
-                        <Box
-                            display='flex'
-                            justifyContent='center'
-                            component="div">
-                            <Typography
-                                className={classes.dateTypograhpyStlye}
-                                variant="h6"
-                                component="h1"
-                            >
-                                {startDate} - {endDate}
-                            </Typography>
-                        </Box>
-                    </Paper>
-                    <CardMedia
-                        component="img"
-                        alt={props.vacation.name + ' picture'}
-                        height="140"
-                        image={props.vacation.image}
-                        title={props.vacation.name + ' picture'}
-                    />
-                    <CardContent>
-                        <Typography
-                            gutterBottom
-                            variant="h5"
-                            component="h2"
+                <Card
+                    className={classes.cardStyle}
+                >
+                    <CardActionArea>
+                        <Paper
+                            className={classes.paperStyle}
                         >
-                            {props.vacation.name}
-                        </Typography>
-                    </CardContent>
-                </CardActionArea>
+                            <Box
+                                display='flex'
+                                justifyContent='center'
+                                component="div">
+                                <Typography
+                                    className={classes.dateTypograhpyStlye}
+                                    variant="h6"
+                                    component="h1"
+                                >
+                                    {startDate} - {endDate}
+                                </Typography>
+                            </Box>
+                        </Paper>
+                        <CardMedia
+                            component="img"
+                            alt={props.vacation.name + ' picture'}
+                            height="140"
+                            image={props.vacation.image}
+                            title={props.vacation.name + ' picture'}
+                        />
+                        <CardContent>
+                            <Typography
+                                gutterBottom
+                                variant="h5"
+                                component="h2"
+                            >
+                                {props.vacation.name}
+                            </Typography>
+                        </CardContent>
+                    </CardActionArea>
 
-                <CardActions
-                    disableSpacing
-                >
-                    <IconButton
-                        onClick={handleAddClick}
-                        aria-label="add to your vacations"
+                    <CardActions
+                        disableSpacing
                     >
-                        <AddIcon />
-                    </IconButton>
+                        {userHasVacation() ?
+                            <IconButton disabled>
+                                <CheckIcon />
+                            </IconButton>
+                            :
+                            <IconButton
+                                onClick={handleAddClick}
+                                aria-label="add to your vacations"
+                            >
+                                <AddIcon />
+                            </IconButton>
+                        }
 
-                    <IconButton
-                        aria-label="share"
+                        <IconButton
+                            aria-label="share"
+                        >
+                            <ShareIcon />
+                        </IconButton>
+
+                        <IconButton
+                            className={clsx(classes.expand, {
+                                [classes.expandOpen]: expanded,
+                            })}
+                            onClick={handleExpandClick}
+                            aria-expanded={expanded}
+                            aria-label="show more"
+                        >
+                            <ExpandMoreIcon />
+                        </IconButton>
+
+                    </CardActions>
+
+                    <Collapse
+                        in={expanded}
+                        timeout="auto"
+                        unmountOnExit
                     >
-                        <ShareIcon />
-                    </IconButton>
-
-                    <IconButton
-                        className={clsx(classes.expand, {
-                            [classes.expandOpen]: expanded,
-                        })}
-                        onClick={handleExpandClick}
-                        aria-expanded={expanded}
-                        aria-label="show more"
-                    >
-                        <ExpandMoreIcon />
-                    </IconButton>
-
-                </CardActions>
-
-                <Collapse
-                    in={expanded}
-                    timeout="auto"
-                    unmountOnExit
-                >
-                    <CardContent>
-                        <Typography paragraph>
-                            <b>Starting at</b> {props.vacation.price} $
+                        <CardContent>
+                            <Typography paragraph>
+                                <b>Starting at</b> {props.vacation.price} $
                         </Typography>
 
-                        <Divider className={classes.dividerStyle} />
+                            <Divider className={classes.dividerStyle} />
 
-                        <Typography paragraph>
-                            {props.vacation.description}
-                        </Typography>
-                    </CardContent>
-                </Collapse>
-            </Card>
-        </Box >
+                            <Typography paragraph>
+                                {props.vacation.description}
+                            </Typography>
+                        </CardContent>
+                    </Collapse>
+                </Card>
+            </Box >
     );
 }
 

@@ -102,7 +102,7 @@ const useStyles = makeStyles((theme) => ({
             duration: theme.transitions.duration.leavingScreen,
         }),
         width: 0,
-        
+
         overflowX: 'hidden',
     },
     content: {
@@ -131,7 +131,8 @@ const Nav = () => {
 
     const handleNavClick = (e) => {
         e.preventDefault();
-
+        const name = e.currentTarget.getAttribute('name')
+        history.push('/' + name)
     }
 
     const handleLogout = (e) => {
@@ -170,7 +171,7 @@ const Nav = () => {
                         <img src={logoText} alt='company name' className={clsx(classes.topName, {
                             [classes.topNameOpen]: open,
                             [classes.topNameClose]: !open,
-                        })}/>   
+                        })} />
                         <IconButton onClick={open ? handleDrawerClose : handleDrawerOpen}>
                             {open ? <ChevronLeftIcon /> : <ChevronRightIcon />}
                         </IconButton>

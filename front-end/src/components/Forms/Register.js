@@ -52,12 +52,12 @@ const Register = () => {
 
     useEffect(() => {
         if (!globalState.userStatus.userCheckedIn) {
-            axios.get('http://localhost:8000/users/check', {
+            axios.get('http://localhost:8000/users/profile', {
                 withCredentials: true,
                 credentials: 'include',
             })
                 .then(response => {
-                    globalDispatch({ type: 'SET_LOGGED_IN', payload: response.data.userType });
+                    globalDispatch({ type: 'SET_DATA', payload: response.data.data[0] });
                     history.push('/')
                 })
                 .catch(error => {

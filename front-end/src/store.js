@@ -6,8 +6,10 @@ const initialState = {
     error: '',
     userStatus: {
         isLoggedIn: false,
-        userType: null,
         userCheckedIn: false,
+        userId: null,
+        userType: null,
+        userVacations: [], 
     },
     vacationsStatus:{
         data: [],

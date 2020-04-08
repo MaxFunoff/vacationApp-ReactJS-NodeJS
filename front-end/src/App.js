@@ -12,6 +12,7 @@ import { Container, CssBaseline } from '@material-ui/core';
 
 /* Pages Component */
 import Home from './pages/Home/Home'
+import Profile from './pages/Profile/Profile'
 import Connect from './pages/Connect/Connect'
 
 /* Componenets */
@@ -31,7 +32,8 @@ const App = () => {
 
             <Route path="/Login" component={(props) => <Connect formType='login' {...props} />} />
             <Route path="/Register" component={(props) => <Connect formType='register' {...props} />} />
-
+            
+            <Route path="/Profile" component={Profile} />
             <Route path="/" component={Home} />
 
           </Switch>

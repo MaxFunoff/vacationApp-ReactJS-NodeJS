@@ -1,11 +1,21 @@
 const Reducer = (state, action) => {
     switch (action.type) {
+        case 'SET_DATA':
+            return {
+                ...state,
+                userStatus: {
+                    isLoggedIn: true,
+                    userCheckedIn: true,
+                    userType: action.payload.userType,
+                    userId: action.payload.Id,
+                    userVacations: action.payload.Vacations ? action.payload.Vacations : [],
+                },
+            };
         case 'SET_LOGGED_IN':
             return {
                 ...state,
                 userStatus: {
                     isLoggedIn: true,
-                    userType: action.payload,
                     userCheckedIn: true,
                 },
             };
@@ -14,13 +24,32 @@ const Reducer = (state, action) => {
                 ...state,
                 userStatus: {
                     isLoggedIn: false,
-                    userType: null,
                     userCheckedIn: true,
+                    userType: null,
+                    userId: null,
+                    userVacations: [],
                 },
                 vacationsStatus: {
                     data: [],
                     error: null,
                 }
+            };
+        case 'ADD_VACATION_TO_USER':
+            return {
+                ...state,
+                userStatus: {
+                    ...state.userStatus,
+                    userVacations: [
+                        ...state.userStatus.userVacations,
+                        {
+                            id: action.payload.id,
+                            Name: action.payload.name,
+                            Image: action.payload.image,
+                            Status: 'pending approval',
+                            lastStatusChange: null
+                        }
+                    ],
+                },
             };
         case 'SET_ERROR':
             return {

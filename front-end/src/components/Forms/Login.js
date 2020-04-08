@@ -47,12 +47,12 @@ const Login = () => {
 
     useEffect(() => {
         if (!globalState.userStatus.userCheckedIn) {
-            axios.get('http://localhost:8000/users/check', {
+            axios.get('http://localhost:8000/users/profile', {
                 withCredentials: true,
                 credentials: 'include',
             })
                 .then(response => {
-                    globalDispatch({ type: 'SET_LOGGED_IN', payload: response.data.userType });
+                    globalDispatch({ type: 'SET_DATA', payload: response.data.data[0] });
                     history.push('/')
                 })
                 .catch(error => {
@@ -89,9 +89,8 @@ const Login = () => {
             },
         })
             .then((response) => {
-                console.log(response)
                 loginDispatch({ type: 'LOGIN_SUCCESS' });
-                globalDispatch({ type: 'SET_LOGGED_IN', payload: response.data.data.type })
+                globalDispatch({ type: 'SET_LOGGED_IN' });
                 history.push('/')
             })
             .catch((error) => {
