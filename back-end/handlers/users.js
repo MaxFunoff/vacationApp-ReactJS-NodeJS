@@ -23,7 +23,7 @@ const users = async (req, res) => {
     DATE_FORMAT(utv.status_change_date, '%Y-%m-%d %H:%i') as lastChanged ` : '';
 
     const query =
-        `SELECT u.id as userId, u.email as userEmail, utv.user_id as vUserId ${adminContent} 
+        `SELECT u.id as userId, u.type, u.email as userEmail, utv.user_id as vUserId ${adminContent} 
     FROM users u 
     LEFT JOIN users_to_vacations utv 
     ON u.id = utv.user_id 
@@ -38,6 +38,46 @@ const users = async (req, res) => {
             mqRes = await pool.execute(query, [id])
         else
             mqRes = await pool.execute(query)
+
+        let data = mqRes[0];
+
+        response.data = mapUserData(data);
+        response.success = true;
+        code = 200;
+    }
+    catch (err) {
+        response.err = err;
+        code = 500;
+    }
+
+    res.status(code).json(response)
+}
+
+const userProfile = async (req, res) => {
+    let response = {
+        success: false,
+    }
+    let code = 500;
+
+    const id = req.user.id;
+
+    const query =
+        `SELECT u.id as userId, u.type, u.email as userEmail, utv.user_id as vUserId , v.id as vacationId,
+    v.name as vacationName,
+    v.image as vacationImage,
+    utv.status as status,
+    DATE_FORMAT(utv.status_change_date, '%Y-%m-%d %H:%i') as lastChanged 
+    FROM users u 
+    LEFT JOIN users_to_vacations utv 
+    ON u.id = utv.user_id 
+    LEFT JOIN vacations v 
+    ON v.id = utv.vacation_id 
+    WHERE u.id = ?`
+
+
+    try {
+        let mqRes;
+        mqRes = await pool.execute(query, [id])
 
         let data = mqRes[0];
 
@@ -139,8 +179,8 @@ const loginUser = async (req, res) => {
         try {
             await pool.execute(query, [refreshToken])
             response.data = user;
-            res.cookie('access-token', accessToken, { maxAge: (60 * 30 * 24 * 7), httpOnly: true });
-            res.cookie('refresh-token', refreshToken, { maxAge: (60 * 60 * 24 * 7), httpOnly: true });
+            res.cookie('access-token', accessToken, { maxAge: (60 * 30 * 24 * 7), httpOnly: true, sameSite: true});
+            res.cookie('refresh-token', refreshToken, { maxAge: (60 * 60 * 24 * 7), httpOnly: true, sameSite: true });
             response.success = true;
             code = 200;
         }
@@ -180,7 +220,7 @@ const logOut = async (req, res) => {
             await pool.execute(query, [cookies['refresh-token']])
 
         response.success = true
-        res.clearCookie('refresh-token').clearCookie('access-token').status(200).json(response)
+        res.clearCookie('refresh-token', {sameSite: true}).clearCookie('access-token', {sameSite: true}).status(200).json(response)
     }
     catch (err) {
         res.status(500).json(response)
@@ -210,6 +250,7 @@ const mapUserData = (data) => {
             let _user = {
                 Id: item.userId,
                 Email: item.userEmail,
+                userType: item.type
             }
             let _vacation = checkVacation(item);
             if (_vacation != null)
@@ -243,6 +284,7 @@ module.exports = {
     loginUser,
     logOut,
     logincheck,
+    userProfile,
 }
 
 

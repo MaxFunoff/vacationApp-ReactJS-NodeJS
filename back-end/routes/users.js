@@ -1,17 +1,19 @@
 const express = require('express');
 const router = express.Router();
-const handler = require('../handlers/users')
-const auth = require('../auth/jwtAuth')
+const handler = require('../handlers/users');
+const authAdmin = require('../auth/jwtAuthAdmin');
+const auth = require('../auth/jwtAuth');
 
 /* GET users listing. */
-router.get('/', auth, handler.users);
-router.get('/check', auth, handler.logincheck)
+router.get('/', authAdmin, handler.users);
+router.get('/profile', auth, handler.userProfile);
+router.get('/check', auth, handler.logincheck);
 
 /* POST users listing */
-router.post('/', handler.registerUser)
-router.post('/login', handler.loginUser)
+router.post('/', handler.registerUser);
+router.post('/login', handler.loginUser);
 
 /*DELETE users listing*/
-router.delete('/logout', handler.logOut)
+router.delete('/logout', handler.logOut);
 
 module.exports = router;
