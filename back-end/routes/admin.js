@@ -27,7 +27,9 @@ const upload = multer({
 });
 
 
-//Admin POST Vacation
+//Admin GET 
+router.get('/statistics', authAdmin, handler.getStats)
+//Admin POST 
 router.post('/vacation', authAdmin, upload.single('image'), handler.createVacation);
 
 

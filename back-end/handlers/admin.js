@@ -29,8 +29,35 @@ const createVacation = async (req, res) => {
 
 }
 
+const getStats = async (req, res) => {
+    let response = {
+        success: false,
+    }
+    let code = 401;
+
+    const query =
+        `SELECT v.name as 'VacationName', COUNT(v.id) as OrderCount FROM vacations v LEFT JOIN users_to_vacations utv ON v.id = utv.vacation_id
+        GROUP BY v.id`
+
+    try {
+        const mqRes = await pool.execute(query)
+
+        response.data = mqRes[0];
+        response.success = true;
+        code = 201;
+    }
+    catch (err) {
+        response.err = err;
+        code = 500;
+    }
+
+    res.status(code).json(response)
+
+}
+
 /* Add more functions */
 
 module.exports = {
     createVacation,
+    getStats,
 }
