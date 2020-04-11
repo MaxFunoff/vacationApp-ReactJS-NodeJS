@@ -8,7 +8,8 @@ const allVacations = async (req, res) => {
 
     const query =
         `SELECT id, name, description, DATE_FORMAT(start_date, "%Y-%m-%d") as StartDate, DATE_FORMAT(end_date, "%Y-%m-%d") as EndDate, price, image 
-        FROM vacations
+        FROM vacations v
+        WHERE v.available
         ORDER BY id ASC`
 
     try {
@@ -67,7 +68,10 @@ const addVacationToUser = async (req, res) => {
 
     const query =
         `INSERT INTO users_to_vacations(id, user_id, vacation_id)
-        VALUES (?, ?, ?)`
+        SELECT ?, ?, v.id
+        FROM vacations AS v
+        WHERE v.id = ? 
+        AND v.available`
 
     try {
         await pool.execute(query, [specialID, userID, vacationID])
