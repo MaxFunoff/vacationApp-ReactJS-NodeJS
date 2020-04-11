@@ -36,7 +36,7 @@ const getStats = async (req, res) => {
     let code = 401;
 
     const query =
-        `SELECT v.name as 'VacationName', COUNT(v.id) as OrderCount FROM vacations v LEFT JOIN users_to_vacations utv ON v.id = utv.vacation_id
+        `SELECT v.name as 'VacationName', COUNT(utv.vacation_id) as OrderCount FROM vacations v LEFT JOIN users_to_vacations utv ON v.id = utv.vacation_id
         GROUP BY v.id`
 
     try {
