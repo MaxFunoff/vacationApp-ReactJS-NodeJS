@@ -1,14 +1,15 @@
 import React, { useEffect, useContext } from 'react';
 import { Context } from '../../store';
 import { useHistory } from 'react-router-dom';
-import { Grid, Typography, Avatar } from '@material-ui/core'
+import { Grid } from '@material-ui/core'
 
-import OrdersTable from '../../components/Tables/OrdersTable'
 import axios from 'axios'
 
+import OrdersGraph from '../../components/Graphs/OrdersGraph'
 
-const Profile = () => {
+const Statistics = () => {
 
+    // const classes = useStyles();
     const [state, dispatch] = useContext(Context);
     const history = useHistory()
 
@@ -28,11 +29,13 @@ const Profile = () => {
                 });
         } else if (!state.userStatus.isLoggedIn)
             history.push('/login')
+        else if (state.userStatus.userType !== 'admin')
+            history.push('')
     }, [dispatch, history, state.userStatus.userCheckedIn, state.userStatus.isLoggedIn, state.userStatus.userType]);
 
 
     return (
-        !state.userStatus.isLoggedIn || !state.userStatus.userType || !state.userStatus.userCheckedIn ? '' :
+        !state.userStatus.isLoggedIn || state.userStatus.userType !== 'admin' || !state.userStatus.userCheckedIn ? '' :
             <div className='home-p'>
                 <Grid
                     container
@@ -42,15 +45,9 @@ const Profile = () => {
                     justify="center"
                     style={{ minHeight: '50vh' }}
                 >
-                    <Avatar>{state.userStatus.userEmail[0]}</Avatar>
-                    <Typography paragraph variant="h4" component="h4">
-                        {state.userStatus.userEmail}
-                    </Typography>
-
-                    <Typography paragraph variant="h5" component="h5">
-                        Orders History
-                    </Typography>
-                    <OrdersTable />
+                    <OrdersGraph type='pie'/>
+                    <OrdersGraph type='column'/>
+                    <OrdersGraph type='line'/>
                 </Grid>
 
             </div>
@@ -58,4 +55,4 @@ const Profile = () => {
 }
 
 
-export default Profile
+export default Statistics

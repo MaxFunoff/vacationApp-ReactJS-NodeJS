@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination, Paper } from '@material-ui/core';
 import { Context } from '../../store';
@@ -11,7 +11,7 @@ const useStyles = makeStyles({
 
 const OrdersTable = () => {
     const classes = useStyles();
-    const [state, dispatch] = useContext(Context);
+    const [state] = useContext(Context);
     const vacations = [...state.userStatus.userVacations]
 
     const createData = (id, name, status, laststatuschange) => {
