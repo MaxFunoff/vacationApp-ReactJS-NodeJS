@@ -109,7 +109,7 @@ const VacationCard = (props) => {
     return (
         !state.userStatus.userType ? '' :
             <Box
-                m={2}
+                m={1}
                 display="flex"
                 alignSelf='flex-start'
             >

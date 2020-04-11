@@ -30,7 +30,7 @@ const VacationWrapper = () => {
 
     return (
         <div className='home-p'>
-            <Box display="flex" justifyContent="center">
+            <Box display="flex" flexDirection="row" flexWrap="wrap">
                 {vacationCards}
             </Box>
         </div >

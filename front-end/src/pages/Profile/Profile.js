@@ -1,21 +1,23 @@
 import React, { useEffect, useContext } from 'react';
 import { Context } from '../../store';
 import { useHistory } from 'react-router-dom';
-import { Grid } from '@material-ui/core'
+import { Grid, Typography, Avatar } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles';
+
+import OrdersTable from '../../components/Tables/OrdersTable'
 import axios from 'axios'
 
 
-const useStyles = makeStyles((theme) => ({
-    logoImg: {
-        maxWidth: '10rem',
-        marginBottom: '0.2rem',
-    },
-}));
+// const useStyles = makeStyles((theme) => ({
+//     logoImg: {
+//         maxWidth: '10rem',
+//         marginBottom: '0.2rem',
+//     },
+// }));
 
 const Profile = () => {
 
-    const classes = useStyles();
+    // const classes = useStyles();
     const [state, dispatch] = useContext(Context);
     const history = useHistory()
 
@@ -41,7 +43,25 @@ const Profile = () => {
     return (
         !state.userStatus.isLoggedIn || !state.userStatus.userType || !state.userStatus.userCheckedIn ? '' :
             <div className='home-p'>
-               im the profile page
+                <Grid
+                    container
+                    spacing={0}
+                    direction="column"
+                    alignItems="center"
+                    justify="center"
+                    style={{ minHeight: '50vh' }}
+                >
+                    <Avatar>{state.userStatus.userEmail[0]}</Avatar>
+                    <Typography paragraph variant="h4" component="h4">
+                        {state.userStatus.userEmail}
+                    </Typography>
+
+                    <Typography paragraph variant="h5" component="h5">
+                        Orders History
+                    </Typography>
+                    <OrdersTable />
+                </Grid>
+
             </div>
     )
 }

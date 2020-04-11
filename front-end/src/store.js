@@ -7,6 +7,7 @@ const initialState = {
     userStatus: {
         isLoggedIn: false,
         userCheckedIn: false,
+        userEmail: null,
         userId: null,
         userType: null,
         userVacations: [], 

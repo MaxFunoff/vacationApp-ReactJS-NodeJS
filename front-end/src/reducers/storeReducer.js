@@ -7,6 +7,7 @@ const Reducer = (state, action) => {
                     isLoggedIn: true,
                     userCheckedIn: true,
                     userType: action.payload.userType,
+                    userEmail: action.payload.Email,
                     userId: action.payload.Id,
                     userVacations: action.payload.Vacations ? action.payload.Vacations : [],
                 },

@@ -50,11 +50,12 @@ const Home = () => {
                     direction="column"
                     alignItems="center"
                     justify="center"
-                    style={{ minHeight: '10vh' }}
+                    style={{ minHeight: '5vh' }}
                 >
                     <img className={classes.logoImg} src={mainLogo} alt='site logo' />
-                    <VacationWrapper />
+                    
                 </Grid>
+                <VacationWrapper />
             </div>
     )
 }
