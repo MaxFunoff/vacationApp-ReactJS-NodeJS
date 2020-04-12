@@ -1,8 +1,7 @@
-import React, { useEffect, useContext, useReducer } from 'react';
+import React, { useReducer } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import { FormHelperText, Container, CssBaseline, TextField, Button, Grid, Typography } from '@material-ui/core';
-import { Context } from '../../store';
 import registerReducer from '../../reducers/registerReducer'
 import axios from 'axios'
 
@@ -48,24 +47,6 @@ const Register = () => {
     };
 
     const [registerState, registerDispatch] = useReducer(registerReducer, initialState);
-    const [globalState, globalDispatch] = useContext(Context)
-
-    useEffect(() => {
-        if (!globalState.userStatus.userCheckedIn) {
-            axios.get('http://localhost:8000/users/profile', {
-                withCredentials: true,
-                credentials: 'include',
-            })
-                .then(response => {
-                    globalDispatch({ type: 'SET_DATA', payload: response.data.data[0] });
-                    history.push('/')
-                })
-                .catch(error => {
-                    globalDispatch({ type: 'SET_LOGGED_OUT' });
-                });
-        } else if (globalState.userStatus.isLoggedIn)
-            history.push('/')
-    }, [globalDispatch, history, globalState.userStatus.userCheckedIn, globalState.userStatus.isLoggedIn]);
 
     /* Handles form submit */
     const handleSubmit = (e) => {
@@ -133,7 +114,6 @@ const Register = () => {
     }
 
     return (
-        !globalState.userStatus.userCheckedIn || globalState.userStatus.isLoggedIn ? '' :
             <Container component='main' maxWidth='xs'>
                 <CssBaseline />
                 <div className={classes.paper}>

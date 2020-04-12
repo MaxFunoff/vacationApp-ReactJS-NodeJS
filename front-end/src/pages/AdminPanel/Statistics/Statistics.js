@@ -1,11 +1,11 @@
 import React, { useEffect, useContext } from 'react';
-import { Context } from '../../store';
+import { Context } from '../../../stores/globalStore';
 import { useHistory } from 'react-router-dom';
 import { Grid } from '@material-ui/core'
 
 import axios from 'axios'
 
-import OrdersGraph from '../../components/Graphs/OrdersGraph'
+import OrdersGraph from '../../../components/Graphs/OrdersGraph'
 
 const Statistics = () => {
 
@@ -36,14 +36,13 @@ const Statistics = () => {
 
     return (
         !state.userStatus.isLoggedIn || state.userStatus.userType !== 'admin' || !state.userStatus.userCheckedIn ? '' :
-            <div className='home-p'>
+            <div className='statistics-p'>
                 <Grid
                     container
                     spacing={0}
                     direction="column"
                     alignItems="center"
                     justify="center"
-                    style={{ minHeight: '50vh' }}
                 >
                     <OrdersGraph type='pie'/>
                     <OrdersGraph type='column'/>

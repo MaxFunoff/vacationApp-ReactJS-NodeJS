@@ -5,7 +5,7 @@ import {
   Switch,
   Route,
 } from "react-router-dom";
-import Store from './store'
+import Store from './stores/globalStore'
 
 /* Material-UI */
 import { Container, CssBaseline } from '@material-ui/core';
@@ -14,7 +14,8 @@ import { Container, CssBaseline } from '@material-ui/core';
 import Home from './pages/Home/Home'
 import Profile from './pages/Profile/Profile'
 import Connect from './pages/Connect/Connect'
-import Statistics from './pages/Statistics/Statistics'
+import Statistics from './pages/AdminPanel/Statistics/Statistics'
+import ManageVacations from './pages/AdminPanel/ManageVacations/ManageVacations'
 
 /* Componenets */
 import Navbar from './components/Nav/Nav'
@@ -34,6 +35,8 @@ const App = () => {
             <Route path="/Login" component={(props) => <Connect formType='login' {...props} />} />
             <Route path="/Register" component={(props) => <Connect formType='register' {...props} />} />
             
+            <Route path="/ManageVacations/:id" component={ManageVacations} />
+            <Route path="/ManageVacations" component={ManageVacations} />
             <Route path="/Statistics" component={Statistics} />
             <Route path="/Profile" component={Profile} />
             <Route path="/" component={Home} />

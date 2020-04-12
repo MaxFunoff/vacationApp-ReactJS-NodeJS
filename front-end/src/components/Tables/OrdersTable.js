@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination, Paper } from '@material-ui/core';
-import { Context } from '../../store';
+import { Context } from '../../stores/globalStore';
 
 const useStyles = makeStyles({
     table: {
@@ -60,7 +60,7 @@ const OrdersTable = () => {
                                 <TableCell
                                     key={column.id}
                                     align={column.align}
-                                    style={{ minWidth: column.minWidth }}
+                                    style={{ minWidth: column.minWidth, backgroundColor: '#3f51b5', color: '#fff' }}
                                 >
                                     {column.label}
                                 </TableCell>
@@ -69,7 +69,6 @@ const OrdersTable = () => {
                     </TableHead>
                     <TableBody>
                         {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                            console.log(row)
                             return (
                                 <TableRow onClick={handleRowClick} id={row.id} hover role="checkbox" tabIndex={-1} key={row.id}>
                                     {columns.map((column) => {

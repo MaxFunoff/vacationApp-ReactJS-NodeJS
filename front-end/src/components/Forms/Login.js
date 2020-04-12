@@ -1,8 +1,8 @@
-import React, { useEffect, useContext, useReducer } from 'react';
+import React, { useContext, useReducer } from 'react';
 import { Link, useHistory } from "react-router-dom";
 import { makeStyles } from '@material-ui/core/styles';
 import { FormHelperText, Container, CssBaseline, TextField, Button, Grid, Typography } from '@material-ui/core';
-import { Context } from '../../store';
+import { Context } from '../../stores/globalStore';
 import loginReducer from '../../reducers/loginReducer'
 import axios from 'axios'
 
@@ -43,25 +43,6 @@ const Login = () => {
     };
 
     const [loginState, loginDispatch] = useReducer(loginReducer, initialState);
-    const [globalState, globalDispatch] = useContext(Context)
-
-    useEffect(() => {
-        if (!globalState.userStatus.userCheckedIn) {
-            axios.get('http://localhost:8000/users/profile', {
-                withCredentials: true,
-                credentials: 'include',
-            })
-                .then(response => {
-                    globalDispatch({ type: 'SET_DATA', payload: response.data.data[0] });
-                    history.push('/')
-                })
-                .catch(error => {
-                    globalDispatch({ type: 'SET_LOGGED_OUT' });
-                });
-        } else if (globalState.userStatus.isLoggedIn)
-            history.push('/')
-    }, [globalDispatch, history, globalState.userStatus.userCheckedIn, globalState.userStatus.isLoggedIn]);
-
 
     /* Handles form submit */
     const handleSubmit = (e) => {
@@ -90,7 +71,6 @@ const Login = () => {
         })
             .then((response) => {
                 loginDispatch({ type: 'LOGIN_SUCCESS' });
-                globalDispatch({ type: 'SET_LOGGED_IN' });
                 history.push('/')
             })
             .catch((error) => {
@@ -111,9 +91,6 @@ const Login = () => {
     }
 
     return (
-        /* Checks if user did the initial check in to prevent premature render */
-        !globalState.userStatus.userCheckedIn ? '' :
-
             <Container component="div" maxWidth="xs">
                 <CssBaseline />
                 <div className={classes.paper}>

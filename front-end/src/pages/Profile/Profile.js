@@ -1,5 +1,5 @@
 import React, { useEffect, useContext } from 'react';
-import { Context } from '../../store';
+import { Context } from '../../stores/globalStore';
 import { useHistory } from 'react-router-dom';
 import { Grid, Typography, Avatar } from '@material-ui/core'
 
@@ -33,14 +33,14 @@ const Profile = () => {
 
     return (
         !state.userStatus.isLoggedIn || !state.userStatus.userType || !state.userStatus.userCheckedIn ? '' :
-            <div className='home-p'>
+            <div className='profile-p'>
                 <Grid
                     container
                     spacing={0}
                     direction="column"
                     alignItems="center"
                     justify="center"
-                    style={{ minHeight: '50vh' }}
+                    style={{ minHeight: '80vh' }}
                 >
                     <Avatar>{state.userStatus.userEmail[0]}</Avatar>
                     <Typography paragraph variant="h4" component="h4">

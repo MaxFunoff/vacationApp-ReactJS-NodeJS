@@ -31,7 +31,7 @@ const OrdersGraph = (props) => {
     const options = {
         animationEnabled: true,
         exportEnabled: true,
-        theme: "light2", //"light1", "dark1", "dark2"
+        theme: "light2", 
         title: {
             text: "Orders Statistics"
         },
@@ -48,10 +48,7 @@ const OrdersGraph = (props) => {
     return (
         <Container component="div" maxWidth="lg" style={{marginBottom: '3rem', marginTop: '2rem'}}>
             <CssBaseline />
-            <CanvasJSChart options={options}
-            /* onRef={ref => this.chart = ref} */
-            />
-            {/*You can get reference to the chart instance as shown above using onRef. This allows you to access all chart properties and methods*/}
+            <CanvasJSChart options={options} />
         </Container>
     );
 

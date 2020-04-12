@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import clsx from 'clsx';
 import './VacationCard.css';
-import { Context } from '../../store';
+import { Context } from '../../stores/globalStore';
 
 import { makeStyles } from '@material-ui/core/styles';
 

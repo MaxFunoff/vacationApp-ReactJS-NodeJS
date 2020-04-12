@@ -1,5 +1,5 @@
 import React, { useEffect, useContext } from 'react';
-import { Context } from '../../store';
+import { Context } from '../../stores/globalStore';
 import { Box } from '@material-ui/core';
 import axios from 'axios'
 import VacationCard from './VacationCard'
