@@ -55,9 +55,97 @@ const getStats = async (req, res) => {
 
 }
 
+const getVacations = async (req, res) => {
+    let response = {
+        success: false,
+    }
+    let code = 500;
+
+    const query =
+        `SELECT id, name, description, DATE_FORMAT(start_date, "%Y-%m-%d") as StartDate, DATE_FORMAT(end_date, "%Y-%m-%d") as EndDate, price, available
+        FROM vacations v
+        ORDER BY id ASC`
+
+    try {
+        let mqRes = await pool.execute(query)
+
+        response.data = mqRes[0];
+        response.success = true;
+        code = 200;
+    }
+    catch (err) {
+        response.err = err;
+        code = 500;
+    }
+
+    res.status(code).json(response)
+}
+
+const getVacationsByID = async (req, res) => {
+    let response = {
+        success: false,
+    }
+    let code = 500;
+    const id = req.params.id;
+    const query =
+        `SELECT id, name, description, DATE_FORMAT(start_date, "%Y-%m-%d") as StartDate, DATE_FORMAT(end_date, "%Y-%m-%d") as EndDate, price, available
+        FROM vacations v
+        WHERE id = ?
+        LIMIT 1`
+
+    try {
+        let mqRes = await pool.execute(query, [id])
+
+        response.data = mqRes[0];
+        response.success = true;
+        code = 200;
+    }
+    catch (err) {
+        console.log(err)
+        response.err = err;
+        code = 500;
+    }
+
+    res.status(code).json(response)
+}
+
+const updateVacation = async (req, res) => {
+    let response = {
+        success: false,
+    }
+    let code = 500;
+
+    console.log(req.body)
+    const query =
+        `UPDATE vacations v SET 
+        name=?,
+        description=?,
+        price=?,
+        start_date=?,
+        end_date=?
+        WHERE v.id = ?`
+
+    try {
+        // let mqRes = await pool.execute(query)
+
+        // response.data = mqRes[0];
+        response.success = true;
+        code = 200;
+    }
+    catch (err) {
+        response.err = err;
+        code = 500;
+    }
+
+    res.status(code).json(response)
+}
+
 /* Add more functions */
 
 module.exports = {
     createVacation,
     getStats,
+    getVacations,
+    updateVacation,
+    getVacationsByID,
 }

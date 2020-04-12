@@ -179,8 +179,8 @@ const loginUser = async (req, res) => {
         try {
             await pool.execute(query, [refreshToken])
             response.data = user;
-            res.cookie('access-token', accessToken, { maxAge: (60 * 30 * 24 * 7), httpOnly: true, sameSite: true});
-            res.cookie('refresh-token', refreshToken, { maxAge: (60 * 60 * 24 * 7), httpOnly: true, sameSite: true });
+            res.cookie('access-token', accessToken, { maxAge: (2147483647), httpOnly: true, sameSite: true});
+            res.cookie('refresh-token', refreshToken, { maxAge: (2147483647), httpOnly: true, sameSite: true });
             response.success = true;
             code = 200;
         }
@@ -236,7 +236,7 @@ const logincheck = async (req, res) => {
 
 /*Access Token Generation*/
 const generateToken = async (user) => {
-    return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '30m' });
+    return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
 }
 
 

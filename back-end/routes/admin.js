@@ -27,10 +27,16 @@ const upload = multer({
 });
 
 
-//Admin GET 
+// Admin GET 
 router.get('/statistics', authAdmin, handler.getStats)
-//Admin POST 
+router.get('/vacations', authAdmin, handler.getVacations)
+router.get('/vacations/:id', authAdmin, handler.getVacationsByID )
+
+// Admin POST 
 router.post('/vacation', authAdmin, upload.single('image'), handler.createVacation);
+
+// Admin PUT
+router.put('/vacation/:id', authAdmin, handler.updateVacation)
 
 
 module.exports = router;
