@@ -42,7 +42,7 @@ const ManageVacations = (props) => {
                         direction="column"
                         alignItems="center"
                         justify="center"
-                        style={{ minHeight: '80vh' }}
+                        style={{ minHeight: '80vh', minWidth: '100vh' }}
                     >
                         {!props.match.params.id ?
                             <VacationsTable /> :

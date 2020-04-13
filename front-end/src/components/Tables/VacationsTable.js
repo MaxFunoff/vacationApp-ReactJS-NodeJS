@@ -7,8 +7,14 @@ import axios from 'axios'
 
 const useStyles = makeStyles({
     table: {
-        minWidth: 650,
+        minWidth: 1000,
+        maxWidth: 1000,
     },
+    box: {
+        width: '100%',
+        maxWidth: 1000,
+        marginBottom: '3rem'
+    }
 });
 
 const VacationsTable = () => {
@@ -38,8 +44,8 @@ const VacationsTable = () => {
     const columns = [
         { id: 'name', label: 'Vacation Name', minWidth: 150 },
         { id: 'description', label: 'Description', minWidth: 100 },
-        { id: 'startdate', label: 'Start Date', minWidth: 100 },
-        { id: 'enddate', label: 'End Date', minWidth: 100 },
+        { id: 'startdate', label: 'Start Date', minWidth: 120 },
+        { id: 'enddate', label: 'End Date', minWidth: 120 },
         { id: 'price', label: 'Price', minWidth: 100 },
         { id: 'available', label: 'Available', minWidth: 100 },
     ];
@@ -61,9 +67,9 @@ const VacationsTable = () => {
     };
     return (
         <>
-            <Paper className={classes.root}>
+            <Paper style={{ marginTop: '3rem' }} className={classes.root}>
                 <TableContainer className={classes.container}>
-                    <Table stickyHeader aria-label="sticky table">
+                    <Table className={classes.table} stickyHeader aria-label="sticky table">
                         <TableHead>
                             <TableRow>
                                 {columns.map((column) => (
@@ -122,7 +128,7 @@ const VacationsTable = () => {
                 />
             </Paper>
 
-            <Box component="div" style={{width: '100%'}}>
+            <Box component="div" className={classes.box}>
                 <Button
                     style={{ marginTop: '1rem' }}
                     size="small"

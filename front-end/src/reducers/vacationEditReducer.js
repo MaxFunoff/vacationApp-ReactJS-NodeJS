@@ -1,5 +1,12 @@
 const Reducer = (state, action) => {
     switch (action.type) {
+        case 'SET_LOADING': {
+            return {
+                ...state,
+                isLoading: true,
+                error: false
+            };
+        }
         case 'SET_DATA': {
             return {
                 ...state,
@@ -11,8 +18,7 @@ const Reducer = (state, action) => {
         case 'SET_ERROR': {
             return {
                 ...state,
-
-                vacation: [],
+                isLoading: false,
                 error: true
             };
         }
@@ -23,6 +29,13 @@ const Reducer = (state, action) => {
                     ...state.vacation,
                     [action.fieldName]: action.payload,
                 }
+            };
+        }
+        case 'SET_SUCCESS': {
+            return {
+                ...state,
+                isLoading: false,
+                error: false,
             };
         }
         default:
