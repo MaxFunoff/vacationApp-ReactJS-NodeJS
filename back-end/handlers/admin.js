@@ -2,21 +2,22 @@ const pool = require('../mysql/dbpool')
 
 const createVacation = async (req, res) => {
     let response = {
+        data:{},
         success: false,
     }
     let code = 401;
 
-    const fileLocation = req.file ? 'http://localhost:3000/uploads/' + req.file.filename : null;
-    const vacation = [req.body.name, req.body.description, req.body.StartDate, req.body.EndDate, req.body.price, fileLocation];
+    const fileLocation = req.file ? 'http://localhost:8000/uploads/' + req.file.filename : null;
+    const vacation = [req.body.name, req.body.description, req.body.StartDate, req.body.EndDate, req.body.price, fileLocation, req.body.available];
 
     const query =
-        `INSERT INTO vacations(name, description, start_date, end_date, price, image) 
-        VALUES (?, ?, ?, ?, ?, ?)`
+        `INSERT INTO vacations(name, description, start_date, end_date, price, image, available) 
+        VALUES (?, ?, ?, ?, ?, ?, ?)`
 
     try {
-        await pool.execute(query, vacation)
-
-        response.data = 'Vacation created succesfully';
+        const mqRes = await pool.execute(query, vacation);
+        console.log(mqRes[0].insertId)
+        response.data.newId = mqRes[0].insertId
         response.success = true;
         code = 201;
     }
@@ -110,29 +111,29 @@ const getVacationsByID = async (req, res) => {
 }
 
 const updateVacation = async (req, res) => {
+    
     let response = {
         success: false,
     }
     let code = 500;
-
-    console.log(req.body)
+    const vacation = [req.body.name, req.body.description, req.body.StartDate, req.body.EndDate, req.body.price, req.body.available, req.params.id];
     const query =
         `UPDATE vacations v SET 
         name=?,
         description=?,
-        price=?,
         start_date=?,
-        end_date=?
+        end_date=?,
+        price=?,
+        available=?
         WHERE v.id = ?`
 
     try {
-        // let mqRes = await pool.execute(query)
-
-        // response.data = mqRes[0];
+        await pool.execute(query, vacation)
         response.success = true;
         code = 200;
     }
     catch (err) {
+        console.log(err)
         response.err = err;
         code = 500;
     }
