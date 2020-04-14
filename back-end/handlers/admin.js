@@ -115,6 +115,8 @@ const updateVacation = async (req, res) => {
     let response = {
         success: false,
     }
+    if(typeof req.params.id !== 'number') return res.status(404).json(response)
+
     let code = 500;
     const vacation = [req.body.name, req.body.description, req.body.StartDate, req.body.EndDate, req.body.price, req.body.available, req.params.id];
     const query =
