@@ -1,7 +1,7 @@
 import React, { useEffect, useContext, useReducer } from 'react';
-import { Link, useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import { makeStyles } from '@material-ui/core/styles';
-import { FormHelperText, Container, CssBaseline, TextField, Button, Typography, InputLabel, MenuItem } from '@material-ui/core';
+import { Container, CssBaseline, TextField, Button, Typography, InputLabel, MenuItem } from '@material-ui/core';
 import { ManageVacationsContext } from '../../stores/manageVacationsStore';
 import vacationEditReducer from '../../reducers/vacationEditReducer'
 import axios from 'axios'
@@ -64,6 +64,7 @@ const VacationsEdit = (props) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         editDispatch({ type: 'SET_LOADING' })
+
         if (props.match.params.id === 'new') {
             const formData = new FormData();
             const vacationEntries = Object.entries(editState.vacation)

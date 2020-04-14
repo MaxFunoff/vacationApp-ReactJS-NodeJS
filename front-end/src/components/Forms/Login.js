@@ -1,8 +1,7 @@
-import React, { useContext, useReducer } from 'react';
+import React, { useReducer } from 'react';
 import { Link, useHistory } from "react-router-dom";
 import { makeStyles } from '@material-ui/core/styles';
 import { FormHelperText, Container, CssBaseline, TextField, Button, Grid, Typography } from '@material-ui/core';
-import { Context } from '../../stores/globalStore';
 import loginReducer from '../../reducers/loginReducer'
 import axios from 'axios'
 
