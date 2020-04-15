@@ -56,25 +56,29 @@ const VacationsEdit = (props) => {
     const [editState, editDispatch] = useReducer(vacationEditReducer, initialState);
 
     useEffect(() => {
-        if (props.match.params.id !== 'new' && Number(props.match.params.id)) {
-            axios.get('http://localhost:8000/admin/vacations/' + props.match.params.id, {
-                withCredentials: true,
-                credentials: 'include',
-            })
-                .then(response => {
-                    if (response.data.data.length === 0)
-                        history.push('/managevacations')
-                    else
-                        editDispatch({ type: 'SET_DATA', payload: response.data.data[0] })
-                })
-                .catch(error => {
-                    editDispatch({ type: 'SET_ERROR', fieldName: 'server', payload: 'Please try again later.' });
-                });
+        if (ManageVacationsState.vacationEdit.id) {
+            editDispatch({ type: 'SET_DATA', payload: ManageVacationsState.vacationEdit })
         }
-        if (props.match.params.id !== 'new' && !Number(props.match.params.id))
-            history.push('/managevacations')
-
-    }, [history, ManageVacationsDispatch, ManageVacationsState.vacations.length, props.match.params.id]);
+        else {
+            if (props.match.params.id !== 'new' && Number(props.match.params.id)) {
+                axios.get('http://localhost:8000/admin/vacations/' + props.match.params.id, {
+                    withCredentials: true,
+                    credentials: 'include',
+                })
+                    .then(response => {
+                        if (response.data.data.length === 0)
+                            history.push('/managevacations')
+                        else
+                            editDispatch({ type: 'SET_DATA', payload: response.data.data[0] })
+                    })
+                    .catch(error => {
+                        editDispatch({ type: 'SET_ERROR', fieldName: 'server', payload: 'Please try again later.' });
+                    });
+            }
+            if (props.match.params.id !== 'new' && !Number(props.match.params.id))
+                history.push('/managevacations')
+        }
+    }, [ManageVacationsState.vacationEdit, history, ManageVacationsDispatch, ManageVacationsState.vacations.length, props.match.params.id]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -98,8 +102,8 @@ const VacationsEdit = (props) => {
                 credentials: 'include',
             })
                 .then((response) => {
-                    editDispatch({ type: 'SET_FIELD', fieldName: 'id', payload: response.data.data.newId })
-                    const _vacations = [...ManageVacationsState.vacations, editState.vacation]
+                    const _vacations = [...ManageVacationsState.vacations, {...editState.vacation, id: response.data.data.newId}]
+                    console.log(_vacations)
 
                     editDispatch({ type: 'SET_SUCCESS' })
                     ManageVacationsDispatch({ type: 'SET_DATA', payload: _vacations })
@@ -135,7 +139,7 @@ const VacationsEdit = (props) => {
         let error;
 
         if (props.match.params.id === 'new') {
-            if (vacationData.image.type !== 'image/jpeg' || vacationData.image.type !== 'image/png') {
+            if (vacationData.image.type !== 'image/jpeg' && vacationData.image.type !== 'image/png') {
                 editDispatch({ type: 'SET_ERROR', fieldName: 'image', payload: 'Please select a PNG file or JPEG file' })
                 error = true;
             }
@@ -175,7 +179,6 @@ const VacationsEdit = (props) => {
     }
 
     return (
-
         <Container component="div" maxWidth="xs">
             <CssBaseline />
             <div className={classes.paper}>

@@ -51,7 +51,8 @@ const VacationsTable = () => {
     ];
 
     const rows = ManageVacationsState.vacations.map(vacation => {
-        return createData(vacation.id, vacation.name, vacation.description, vacation.StartDate, vacation.EndDate, vacation.price + ' $', vacation.available ? 'True' : 'False')
+        let available = String(vacation.available) === '1' ? 'True' : 'False'
+        return createData(vacation.id, vacation.name, vacation.description, vacation.StartDate, vacation.EndDate, vacation.price + ' $', available)
     });
 
     const [page, setPage] = React.useState(0);
@@ -105,7 +106,10 @@ const VacationsTable = () => {
                                                 size="small"
                                                 variant="outlined"
                                                 color="primary"
-                                                onClick={() => {
+                                                onClick={(e) => {
+                                                    e.preventDefault()
+                                                    let index = ManageVacationsState.vacations.findIndex(vacation => vacation.id === row.id)
+                                                    ManageVacationsDispatch({type: 'SET_EDIT', payload: ManageVacationsState.vacations[index]})
                                                     history.push('/managevacations/' + row.id)
                                                 }}>
                                                 Edit

@@ -16,6 +16,12 @@ const Reducer = (state, action) => {
                 error: true
             };
         }
+        case 'SET_EDIT': {
+            return {
+                ...state,
+                vacationEdit: {...action.payload}
+            }
+        }
         default:
             return state;
     }

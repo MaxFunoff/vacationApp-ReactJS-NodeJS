@@ -4,6 +4,7 @@ import Reducer from '../reducers/manageVacationsReducer'
 
 const initialState = {
     vacations: [],
+    vacationEdit: {},
     error: false
 };
 
