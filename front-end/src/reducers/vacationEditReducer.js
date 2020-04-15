@@ -4,7 +4,16 @@ const Reducer = (state, action) => {
             return {
                 ...state,
                 isLoading: true,
-                error: false
+                error: false,
+                errorMsg: {
+                    image: '',
+                    name: '',
+                    description: '',
+                    startdate: '',
+                    enddate: '',
+                    price: '',
+                    server:'',
+                },
             };
         }
         case 'SET_DATA': {
@@ -12,14 +21,27 @@ const Reducer = (state, action) => {
                 ...state,
 
                 vacation: { ...action.payload },
-                error: false
+                error: false,
+                errorMsg: {
+                    image: '',
+                    name: '',
+                    description: '',
+                    startdate: '',
+                    enddate: '',
+                    price: '',
+                    server:'',
+                },
             };
         }
         case 'SET_ERROR': {
             return {
                 ...state,
                 isLoading: false,
-                error: true
+                error: true,
+                errorMsg:{
+                    ...state.errorMsg,
+                    [action.fieldName]: action.payload
+                }
             };
         }
         case 'SET_FIELD': {
@@ -36,6 +58,15 @@ const Reducer = (state, action) => {
                 ...state,
                 isLoading: false,
                 error: false,
+                errorMsg: {
+                    image: '',
+                    name: '',
+                    description: '',
+                    startdate: '',
+                    enddate: '',
+                    price: '',
+                    server:'',
+                },
             };
         }
         default:

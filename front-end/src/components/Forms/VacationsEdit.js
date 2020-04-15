@@ -1,7 +1,7 @@
 import React, { useEffect, useContext, useReducer } from 'react';
 import { useHistory } from "react-router-dom";
 import { makeStyles } from '@material-ui/core/styles';
-import { Container, CssBaseline, TextField, Button, Typography, InputLabel, MenuItem } from '@material-ui/core';
+import { FormHelperText, Container, CssBaseline, TextField, Button, Typography, InputLabel, MenuItem } from '@material-ui/core';
 import { ManageVacationsContext } from '../../stores/manageVacationsStore';
 import vacationEditReducer from '../../reducers/vacationEditReducer'
 import axios from 'axios'
@@ -33,6 +33,15 @@ const VacationsEdit = (props) => {
     const initialState = {
         isLoading: false,
         error: false,
+        errorMsg: {
+            image: '',
+            name: '',
+            description: '',
+            startdate: '',
+            enddate: '',
+            price: '',
+            server: '',
+        },
         vacation: {
             image: {},
             name: '',
@@ -40,30 +49,39 @@ const VacationsEdit = (props) => {
             StartDate: '',
             EndDate: '',
             price: '',
-            available: '',
+            available: '0',
         }
     }
     const [ManageVacationsState, ManageVacationsDispatch] = useContext(ManageVacationsContext)
     const [editState, editDispatch] = useReducer(vacationEditReducer, initialState);
 
     useEffect(() => {
-        if (props.match.params.id !== 'new') {
+        if (props.match.params.id !== 'new' && Number(props.match.params.id)) {
             axios.get('http://localhost:8000/admin/vacations/' + props.match.params.id, {
                 withCredentials: true,
                 credentials: 'include',
             })
                 .then(response => {
-                    editDispatch({ type: 'SET_DATA', payload: response.data.data[0] })
+                    if (response.data.data.length === 0)
+                        history.push('/managevacations')
+                    else
+                        editDispatch({ type: 'SET_DATA', payload: response.data.data[0] })
                 })
                 .catch(error => {
-                    editDispatch({ type: 'SET_ERROR' });
+                    editDispatch({ type: 'SET_ERROR', fieldName: 'server', payload: 'Please try again later.' });
                 });
         }
-    }, [ManageVacationsDispatch, ManageVacationsState.vacations.length, props.match.params.id]);
+        if (props.match.params.id !== 'new' && !Number(props.match.params.id))
+            history.push('/managevacations')
+
+    }, [history, ManageVacationsDispatch, ManageVacationsState.vacations.length, props.match.params.id]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
         editDispatch({ type: 'SET_LOADING' })
+
+        const err = validateData()
+        if (err) return
 
         if (props.match.params.id === 'new') {
             const formData = new FormData();
@@ -84,12 +102,12 @@ const VacationsEdit = (props) => {
                     const _vacations = [...ManageVacationsState.vacations, editState.vacation]
 
                     editDispatch({ type: 'SET_SUCCESS' })
-                    ManageVacationsDispatch({ type: 'SET_DATA', payload: _vacations})
+                    ManageVacationsDispatch({ type: 'SET_DATA', payload: _vacations })
                     history.push('/managevacations')
                 }).catch((error) => {
-                    editDispatch({ type: 'SET_ERROR' });
+                    editDispatch({ type: 'SET_ERROR', fieldName: 'server', payload: 'Please try again later.' });
                 });
-        }else{
+        } else {
             axios.put("http://localhost:8000/admin/vacation/" + props.match.params.id, editState.vacation, {
                 withCredentials: true,
                 credentials: 'include',
@@ -97,19 +115,67 @@ const VacationsEdit = (props) => {
                 .then((response) => {
                     const _vacations = [...ManageVacationsState.vacations]
                     const vacationIndex = _vacations.findIndex(item => item.id === editState.vacation.id)
-                    _vacations[vacationIndex] = {...editState.vacation}
+                    _vacations[vacationIndex] = { ...editState.vacation }
 
                     editDispatch({ type: 'SET_SUCCESS' })
-                    ManageVacationsDispatch({ type: 'SET_DATA', payload: _vacations})
+                    ManageVacationsDispatch({ type: 'SET_DATA', payload: _vacations })
 
                     history.push('/managevacations')
                 }).catch((error) => {
-                    editDispatch({ type: 'SET_ERROR' });
+                    editDispatch({ type: 'SET_ERROR', fieldName: 'server', payload: 'Please try again later.' });
                 });
         }
-
     }
+
+    const validateData = () => {
+        const vacationData = { ...editState.vacation };
+        const today = new Date().getTime()
+        vacationData.StartDate = new Date(vacationData.StartDate).getTime()
+        vacationData.EndDate = new Date(vacationData.EndDate).getTime()
+        let error;
+
+        if (props.match.params.id === 'new') {
+            if (vacationData.image.type !== 'image/jpeg' || vacationData.image.type !== 'image/png') {
+                editDispatch({ type: 'SET_ERROR', fieldName: 'image', payload: 'Please select a PNG file or JPEG file' })
+                error = true;
+            }
+        }
+
+        if (vacationData.name.length < 5) {
+            editDispatch({ type: 'SET_ERROR', fieldName: 'name', payload: 'Vacation name must be at least 5 characters' })
+            error = true;
+        }
+
+        if (vacationData.description.length < 20) {
+            editDispatch({ type: 'SET_ERROR', fieldName: 'description', payload: 'Vacation description must be at least 20 characters' })
+            error = true;
+        }
+
+        if (vacationData.description.length < 20) {
+            editDispatch({ type: 'SET_ERROR', fieldName: 'description', payload: 'Vacation description must be at least 20 characters' })
+            error = true;
+        }
+
+        if (vacationData.StartDate < today || !vacationData.StartDate) {
+            editDispatch({ type: 'SET_ERROR', fieldName: 'startdate', payload: 'Start date must be after today' })
+            error = true;
+        }
+
+        if (vacationData.StartDate > vacationData.EndDate || !vacationData.EndDate) {
+            editDispatch({ type: 'SET_ERROR', fieldName: 'enddate', payload: 'End date must be after Start date' })
+            error = true;
+        }
+
+        if (vacationData.price <= 0) {
+            editDispatch({ type: 'SET_ERROR', fieldName: 'price', payload: 'Price must be above 0' })
+            error = true;
+        }
+
+        return error
+    }
+
     return (
+
         <Container component="div" maxWidth="xs">
             <CssBaseline />
             <div className={classes.paper}>
@@ -119,7 +185,17 @@ const VacationsEdit = (props) => {
                 <form className={classes.form} noValidate autoComplete="off" onSubmit={handleSubmit}>
                     {props.match.params.id !== 'new' ? '' :
                         <>
-                            <InputLabel style={{ margin: '0.5rem 0' }} variant='standard'>Vacation Image</InputLabel>
+                            <InputLabel
+                                style={{ margin: '0.5rem 0' }}
+                                variant='standard'
+                                error={Boolean(editState.errorMsg.image)}
+                            >Vacation Image
+                             </InputLabel>
+
+                            <FormHelperText error>
+                                {editState.errorMsg.image}
+                            </FormHelperText>
+
                             <input
                                 type='file'
                                 accept="image/*"
@@ -137,10 +213,13 @@ const VacationsEdit = (props) => {
                         </>
                     }
                     <TextField
+                        required
                         margin="normal"
                         label="Vacation Name"
                         InputLabelProps={{ shrink: true }}
                         value={editState.vacation.name}
+                        error={Boolean(editState.errorMsg.name)}
+                        helperText={editState.errorMsg.name}
                         onChange={e =>
                             editDispatch({
                                 type: 'SET_FIELD',
@@ -150,6 +229,7 @@ const VacationsEdit = (props) => {
                         }
                     />
                     <TextField
+                        required
                         margin="normal"
                         fullWidth
                         multiline
@@ -157,6 +237,8 @@ const VacationsEdit = (props) => {
                         label='Description'
                         InputLabelProps={{ shrink: true }}
                         value={editState.vacation.description}
+                        error={Boolean(editState.errorMsg.description)}
+                        helperText={editState.errorMsg.description}
                         onChange={e =>
                             editDispatch({
                                 type: 'SET_FIELD',
@@ -166,11 +248,14 @@ const VacationsEdit = (props) => {
                         }
                     />
                     <TextField
+                        required
                         margin="normal"
                         type="date"
                         label='Start Date'
                         InputLabelProps={{ shrink: true }}
                         value={editState.vacation.StartDate}
+                        error={Boolean(editState.errorMsg.startdate)}
+                        helperText={editState.errorMsg.startdate}
                         onChange={e =>
                             editDispatch({
                                 type: 'SET_FIELD',
@@ -180,12 +265,15 @@ const VacationsEdit = (props) => {
                         }
                     />
                     <TextField
+                        required
                         style={{ marginLeft: '1rem' }}
                         margin="normal"
                         type="date"
                         label='End Date'
                         InputLabelProps={{ shrink: true }}
                         value={editState.vacation.EndDate}
+                        error={Boolean(editState.errorMsg.enddate)}
+                        helperText={editState.errorMsg.enddate}
                         onChange={e =>
                             editDispatch({
                                 type: 'SET_FIELD',
@@ -195,11 +283,14 @@ const VacationsEdit = (props) => {
                         }
                     />
                     <TextField
+                        required
                         margin="normal"
                         type="number"
                         label='Price'
                         InputLabelProps={{ shrink: true }}
                         value={editState.vacation.price}
+                        error={Boolean(editState.errorMsg.price)}
+                        helperText={editState.errorMsg.price}
                         onChange={e =>
                             editDispatch({
                                 type: 'SET_FIELD',
@@ -228,7 +319,7 @@ const VacationsEdit = (props) => {
                         <MenuItem value="1">True</MenuItem>
 
                     </TextField>
-                    {/* {loginState.errorType === 'server' && <FormHelperText error>Please try again later</FormHelperText>} */}
+                    <FormHelperText error>{editState.errorMsg.server}</FormHelperText>
                     <div>
                         <Button
                             type="submit"
