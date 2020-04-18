@@ -1,7 +1,7 @@
 import React, { useReducer, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination, Paper, Button } from '@material-ui/core';
-import manageOrdersReducer from '../../reducers/manageOrdersReducer'
+import manageUsersReducer from '../../reducers/manageUsersReducer'
 import axios from 'axios';
 
 const useStyles = makeStyles({
@@ -10,45 +10,41 @@ const useStyles = makeStyles({
     },
 });
 
-const ManageOrdersTable = () => {
+const ManageUsersTable = () => {
     const classes = useStyles();
 
     const initialState = {
-        orders: [],
+        users: [],
         error: false,
     };
 
-    const [state, dispatch] = useReducer(manageOrdersReducer, initialState);
+    const [state, dispatch] = useReducer(manageUsersReducer, initialState);
 
     useEffect(() => {
-        axios.get('http://localhost:8000/admin/orders', {
+        axios.get('http://localhost:8000/users', {
             withCredentials: true,
             credentials: 'include',
         })
             .then(response => {
                 dispatch({ type: 'SET_DATA', payload: response.data.data });
+                console.log(response)
             })
             .catch(error => {
                 console.log(error)
             });
     }, [])
-    const createData = (id, userId, vacationId, userEmail, orderDate, lastChangeStatus, status) => {
-        return { id, userId, vacationId, userEmail, orderDate, lastChangeStatus, status };
+    const createData = (id, Email, userType) => {
+        return { id, Email, userType };
     }
 
     const columns = [
-        { id: 'id', label: 'Order #', minWidth: 50 },
-        { id: 'userId', label: 'User #', minWidth: 40 },
-        { id: 'vacationId', label: 'Vacation #', minWidth: 40 },
-        { id: 'userEmail', label: 'User Email', minWidth: 100 },
-        { id: 'orderDate', label: 'Order Date', minWidth: 100 },
-        { id: 'lastChangeStatus', label: 'Last Change', minWidth: 100 },
-        { id: 'status', label: 'Status', minWidth: 70 },
-
+        { id: 'id', label: 'User #', minWidth: 50 },
+        { id: 'Email', label: 'Email', minWidth: 40 },
+        { id: 'userType', label: 'User Type', minWidth: 100 },
     ];
 
-    const rows = state.orders.map(order => {
-        return createData(order.id, order.user_id, order.vacation_id, order.userEmail, order.orderDate, order.lastChangeStatus, order.status)
+    const rows = state.users.map(user => {
+        return createData(user.Id, user.Email, user.userType)
     });
 
     const [page, setPage] = React.useState(0);
@@ -63,43 +59,37 @@ const ManageOrdersTable = () => {
         setPage(0);
     };
 
-    const onAcceptRefund = (e) => {
+    const onSetAdmin = (e) => {
         e.preventDefault()
-        const orderId = e.currentTarget.id
-        const vacationId = orderId.split('$')[1]
-        axios.delete('http://localhost:8000/admin/orders/' + vacationId + '/refund', {
+        const userId = e.currentTarget.id
+        axios.put('http://localhost:8000/admin/setAdmin/' + userId, {}, {
             withCredentials: true,
             credentials: 'include',
         })
             .then(response => {
-                const _orders = [...state.orders]
-                const _ordersIndex = _orders.findIndex(order => order.id === orderId)
-                _orders.splice(_ordersIndex, 1)
-                dispatch({ type: 'SET_DATA', payload: _orders });
+                const _users = [...state.users]
+                const _usersIndex = _users.findIndex(user => user.Id.toString() === userId)
+                console.log(_users)
+                console.log(_usersIndex)
+                _users[_usersIndex].userType = 'admin'
+                dispatch({ type: 'SET_DATA', payload: _users });
             })
             .catch(error => {
                 console.log(error)
             });
     }
-    const onApprove = (e) => {
+    const onRemoveAdmin = (e) => {
         e.preventDefault()
-        const orderId = e.currentTarget.id
-        const vacationId = orderId.split('$')[1]
-        axios.put('http://localhost:8000/admin/orders/' + vacationId + '/approve', {}, {
+        const userId = e.currentTarget.id
+        axios.put('http://localhost:8000/admin/removeAdmin/' + userId, {}, {
             withCredentials: true,
             credentials: 'include',
         })
             .then(response => {
-                const _orders = [...state.orders]
-                const _ordersIndex = _orders.findIndex(order => order.id === orderId)
-                _orders[_ordersIndex].status = 'approved';
-                const d = new Date();
-                const dformat =
-                    [d.getFullYear(), d.getMonth() + 1, d.getDate()].join('-')
-                    + ' ' +
-                    [d.getHours(), d.getMinutes()].join(':');
-                _orders[_ordersIndex].lastChangeStatus = dformat;
-                dispatch({ type: 'SET_DATA', payload: _orders });
+                const _users = [...state.users]
+                const _usersIndex = _users.findIndex(user => user.Id.toString() === userId)
+                _users[_usersIndex].userType = 'normal'
+                dispatch({ type: 'SET_DATA', payload: _users });
             })
             .catch(error => {
                 console.log(error)
@@ -124,7 +114,7 @@ const ManageOrdersTable = () => {
                             ))}
                             <TableCell
                                 align='center'
-                                style={{ minWidth: 50, backgroundColor: '#3f51b5', color: '#fff' }}>
+                                style={{ minWidth: 100, backgroundColor: '#3f51b5', color: '#fff' }}>
                                 Action
                             </TableCell>
                         </TableRow>
@@ -142,24 +132,24 @@ const ManageOrdersTable = () => {
                                         );
                                     })}
                                     <TableCell>
-                                        {row.status === 'pending refund' &&
+                                        {row.userType === 'admin' &&
                                             <Button
                                                 id={row.id}
                                                 size="small"
                                                 variant="outlined"
                                                 color="secondary"
-                                                onClick={onAcceptRefund}>
-                                                Accept Refund
+                                                onClick={onRemoveAdmin}>
+                                                Remove Admin
                                             </Button>
                                         }
-                                        {row.status === 'pending approval' &&
+                                        {row.userType === 'normal' &&
                                             <Button
                                                 id={row.id}
                                                 size="small"
                                                 variant="outlined"
                                                 color="primary"
-                                                onClick={onApprove}>
-                                                Approve
+                                                onClick={onSetAdmin}>
+                                                Set Admin
                                             </Button>
                                         }
                                     </TableCell>
@@ -182,4 +172,4 @@ const ManageOrdersTable = () => {
     );
 }
 
-export default ManageOrdersTable;
+export default ManageUsersTable;

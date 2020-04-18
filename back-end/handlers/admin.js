@@ -229,6 +229,62 @@ const refundOrder = async (req, res) => {
     res.status(code).json(response)
 }
 
+const setAdmin = async (req, res) => {
+    let response = {
+        success: false,
+    }
+    let code = 500;
+    const userId = req.params.id;
+
+    const query =
+        `UPDATE users
+        SET type= CASE 
+            WHEN type='normal' THEN 'admin'
+            ELSE type
+        END
+        WHERE id = ?`
+
+    try {
+        await pool.execute(query, [userId])
+        response.success = true;
+        response.data = 'User type set to admin'
+        code = 200;
+    }
+    catch (err) {
+        console.log(err)
+        code = 500;
+        response.err = 'Please try again later'
+    }
+    res.status(code).json(response)
+}
+const removeAdmin = async (req, res) => {
+    let response = {
+        success: false,
+    }
+    let code = 500;
+    const userId = req.params.id;
+
+    const query =
+        `UPDATE users
+        SET type= CASE 
+            WHEN type='admin' THEN 'normal'
+            ELSE type
+        END
+        WHERE id = ?`
+
+    try {
+        await pool.execute(query, [userId])
+        response.success = true;
+        response.data = 'User type set to normal'
+        code = 200;
+    }
+    catch (err) {
+        console.log(err)
+        code = 500;
+        response.err = 'Please try again later'
+    }
+    res.status(code).json(response)
+}
 /* Add more functions */
 
 module.exports = {
@@ -240,4 +296,6 @@ module.exports = {
     getOrders,
     approveOrder,
     refundOrder,
+    setAdmin,
+    removeAdmin
 }

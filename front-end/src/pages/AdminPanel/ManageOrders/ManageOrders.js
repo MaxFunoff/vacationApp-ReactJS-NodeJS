@@ -5,7 +5,7 @@ import { Grid } from '@material-ui/core'
 import ManageOrdersTable from '../../../components/Tables/ManageOrdersTable'
 import axios from 'axios'
 
-const ManageVacations = (props) => {
+const ManageOrders = (props) => {
     const [state, dispatch] = useContext(Context);
     const history = useHistory()
 
@@ -49,4 +49,4 @@ const ManageVacations = (props) => {
 }
 
 
-export default ManageVacations
+export default ManageOrders

@@ -18,6 +18,6 @@ ReactJS for the front-end
 
 
 
-BACK-END: [■■■■■■■■■□]90%
+BACK-END: [■■■■■■■■■■]100%
 
-FRONT-END: [■□□□□□□□□□]10%
+FRONT-END: [■■■■■■■■■□]90%

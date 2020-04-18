@@ -39,6 +39,8 @@ router.post('/vacation', authAdmin, upload.single('image'), handler.createVacati
 // Admin PUT
 router.put('/vacation/:id', authAdmin, handler.updateVacation)
 router.put('/orders/:id/approve', authAdmin, handler.approveOrder)
+router.put('/setAdmin/:id', authAdmin, handler.setAdmin)
+router.put('/removeAdmin/:id', authAdmin, handler.removeAdmin)
 
 // Admin DELETE
 router.delete('/orders/:id/refund', authAdmin, handler.refundOrder)
