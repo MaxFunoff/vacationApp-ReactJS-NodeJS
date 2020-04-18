@@ -109,11 +109,11 @@ const VacationsTable = () => {
                                                 onClick={(e) => {
                                                     e.preventDefault()
                                                     let index = ManageVacationsState.vacations.findIndex(vacation => vacation.id === row.id)
-                                                    ManageVacationsDispatch({type: 'SET_EDIT', payload: ManageVacationsState.vacations[index]})
+                                                    ManageVacationsDispatch({ type: 'SET_EDIT', payload: ManageVacationsState.vacations[index] })
                                                     history.push('/managevacations/' + row.id)
                                                 }}>
                                                 Edit
-                                        </Button>
+                                            </Button>
                                         </TableCell>
                                     </TableRow>
                                 );

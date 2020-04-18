@@ -1,14 +1,11 @@
 import React, { useEffect, useContext } from 'react';
-import { Context } from '../../stores/globalStore';
+import { Context } from '../../../stores/globalStore';
 import { useHistory } from 'react-router-dom';
-import { Grid, Typography, Avatar } from '@material-ui/core'
-
-import OrdersTable from '../../components/Tables/OrdersTable'
+import { Grid } from '@material-ui/core'
+import ManageOrdersTable from '../../../components/Tables/ManageOrdersTable'
 import axios from 'axios'
 
-
-const Profile = () => {
-
+const ManageVacations = (props) => {
     const [state, dispatch] = useContext(Context);
     const history = useHistory()
 
@@ -20,7 +17,6 @@ const Profile = () => {
                 credentials: 'include',
             })
                 .then(response => {
-                    console.log(response.data.data[0])
                     dispatch({ type: 'SET_DATA', payload: response.data.data[0] });
                 })
                 .catch(error => {
@@ -29,29 +25,23 @@ const Profile = () => {
                 });
         } else if (!state.userStatus.isLoggedIn)
             history.push('/login')
+        else if (state.userStatus.userType !== 'admin')
+            history.push('/home')
     }, [dispatch, history, state.userStatus.userCheckedIn, state.userStatus.isLoggedIn, state.userStatus.userType]);
 
 
     return (
-        !state.userStatus.isLoggedIn || !state.userStatus.userType || !state.userStatus.userCheckedIn ? '' :
-            <div className='profile-p'>
+        !state.userStatus.isLoggedIn || state.userStatus.userType !== 'admin' || !state.userStatus.userCheckedIn ? '' :
+            <div className='manage-orders-p'>
                 <Grid
                     container
                     spacing={0}
                     direction="column"
                     alignItems="center"
                     justify="center"
-                    style={{ minHeight: '80vh' }}
+                    style={{ minHeight: '80vh', minWidth: '100vh' }}
                 >
-                    <Avatar>{state.userStatus.userEmail[0]}</Avatar>
-                    <Typography paragraph variant="h4" component="h4">
-                        {state.userStatus.userEmail}
-                    </Typography>
-
-                    <Typography paragraph variant="h5" component="h5">
-                        Orders History
-                    </Typography>
-                    <OrdersTable />
+                    <ManageOrdersTable />
                 </Grid>
 
             </div>
@@ -59,4 +49,4 @@ const Profile = () => {
 }
 
 
-export default Profile
+export default ManageVacations

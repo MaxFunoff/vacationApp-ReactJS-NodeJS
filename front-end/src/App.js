@@ -16,6 +16,7 @@ import Profile from './pages/Profile/Profile'
 import Connect from './pages/Connect/Connect'
 import Statistics from './pages/AdminPanel/Statistics/Statistics'
 import ManageVacations from './pages/AdminPanel/ManageVacations/ManageVacations'
+import ManageOrders from './pages/AdminPanel/ManageOrders/ManageOrders'
 
 /* Componenets */
 import Navbar from './components/Nav/Nav'
@@ -35,6 +36,7 @@ const App = () => {
             <Route path="/Login" component={(props) => <Connect formType='login' {...props} />} />
             <Route path="/Register" component={(props) => <Connect formType='register' {...props} />} />
             
+            <Route path="/ManageOrders/" component={ManageOrders} />
             <Route path="/ManageVacations/:id" component={ManageVacations} />
             <Route path="/ManageVacations" component={ManageVacations} />
             <Route path="/Statistics" component={Statistics} />

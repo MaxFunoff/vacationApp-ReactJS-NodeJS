@@ -62,7 +62,8 @@ const userProfile = async (req, res) => {
     const id = req.user.id;
 
     const query =
-        `SELECT u.id as userId, u.type, u.email as userEmail, utv.user_id as vUserId , v.id as vacationId,
+        `SELECT u.id as userId, u.type, u.email as userEmail, v.id as vacationId,
+        utv.id as orderId,
     v.name as vacationName,
     v.image as vacationImage,
     utv.status as status,
@@ -179,7 +180,7 @@ const loginUser = async (req, res) => {
         try {
             await pool.execute(query, [refreshToken])
             response.data = user;
-            res.cookie('access-token', accessToken, { maxAge: (2147483647), httpOnly: true, sameSite: true});
+            res.cookie('access-token', accessToken, { maxAge: (2147483647), httpOnly: true, sameSite: true });
             res.cookie('refresh-token', refreshToken, { maxAge: (2147483647), httpOnly: true, sameSite: true });
             response.success = true;
             code = 200;
@@ -220,7 +221,7 @@ const logOut = async (req, res) => {
             await pool.execute(query, [cookies['refresh-token']])
 
         response.success = true
-        res.clearCookie('refresh-token', {sameSite: true}).clearCookie('access-token', {sameSite: true}).status(200).json(response)
+        res.clearCookie('refresh-token', { sameSite: true }).clearCookie('access-token', { sameSite: true }).status(200).json(response)
     }
     catch (err) {
         res.status(500).json(response)
@@ -274,7 +275,7 @@ const mapUserData = (data) => {
 /*Check Vacations*/
 const checkVacation = (item) => {
     if (item.vacationId == null) return;
-    const vacation = { id: item.vacationId, Name: item.vacationName, Image: item.vacationImage, Status: item.status, lastStatusChange: item.lastChanged }
+    const vacation = { vacationId: item.vacationId, orderId: item.orderId, Name: item.vacationName, Image: item.vacationImage, Status: item.status, lastStatusChange: item.lastChanged }
     return (vacation)
 }
 

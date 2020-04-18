@@ -101,7 +101,7 @@ const VacationCard = (props) => {
     }
 
     const userHasVacation = () => {
-        const vacationIndex = state.userStatus.userVacations.findIndex(vacation => vacation.id === props.vacation.id)
+        const vacationIndex = state.userStatus.userVacations.findIndex(vacation => vacation.vacationId === props.vacation.id)
         if (vacationIndex !== -1) return true
         else return false
     }

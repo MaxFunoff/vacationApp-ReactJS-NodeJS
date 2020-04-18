@@ -2,7 +2,7 @@ const pool = require('../mysql/dbpool')
 
 const createVacation = async (req, res) => {
     let response = {
-        data:{},
+        data: {},
         success: false,
     }
     let code = 401;
@@ -111,11 +111,11 @@ const getVacationsByID = async (req, res) => {
 }
 
 const updateVacation = async (req, res) => {
-    
+
     let response = {
         success: false,
     }
-    if(!Number(req.params.id)) return res.status(404).json(response)
+    if (!Number(req.params.id)) return res.status(404).json(response)
 
     let code = 500;
     const vacation = [req.body.name, req.body.description, req.body.StartDate, req.body.EndDate, req.body.price, req.body.available, req.params.id];
@@ -130,7 +130,7 @@ const updateVacation = async (req, res) => {
         WHERE v.id = ?`
 
     try {
-        await pool.execute(query, vacation)
+        pool.execute(query, vacation)
         response.success = true;
         code = 200;
     }
@@ -142,6 +142,92 @@ const updateVacation = async (req, res) => {
 
     res.status(code).json(response)
 }
+const getOrders = async (req, res) => {
+
+    let response = {
+        success: false,
+    }
+
+    let code = 500;
+    const query =
+        `SELECT utv.id, utv.user_id, u.email as userEmail,
+        utv.vacation_id, utv.status,
+        DATE_FORMAT(utv.status_change_date, '%Y-%m-%d %H:%i') as lastChangeStatus,
+        DATE_FORMAT(utv.date, '%Y-%m-%d %H:%i') as orderDate
+        FROM users_to_vacations utv
+        LEFT JOIN users u ON u.id = utv.user_id
+        WHERE utv.status = 'pending approval' OR utv.status = 'pending refund'`
+
+    try {
+        let mqRes = await pool.execute(query)
+        response.success = true;
+        response.data = mqRes[0]
+        code = 200;
+    }
+    catch (err) {
+        console.log(err)
+        response.err = err;
+        code = 500;
+    }
+
+    res.status(code).json(response)
+}
+
+const approveOrder = async (req, res) => {
+    let response = {
+        success: false,
+    }
+    let code = 500;
+    const userID = req.user.id;
+    const vacationID = req.params.id;
+    const specialID = userID.toString() + '$' + vacationID.toString();
+
+    const query =
+        `UPDATE users_to_vacations
+        SET status= CASE 
+            WHEN status='pending approval' THEN 'approved'
+            ELSE status
+        END
+        WHERE id = ?`
+
+    try {
+        await pool.execute(query, [specialID])
+        response.success = true;
+        response.data = 'Order approved'
+        code = 200;
+    }
+    catch (err) {
+        console.log(err)
+        code = 500;
+        response.err = 'Please try again later'
+    }
+    res.status(code).json(response)
+}
+const refundOrder = async (req, res) => {
+    let response = {
+        success: false,
+    }
+    let code = 500;
+    const userID = req.user.id;
+    const vacationID = req.params.id;
+    const specialID = userID.toString() + '$' + vacationID.toString();
+
+    const query =
+        `DELETE FROM users_to_vacations WHERE id = ?`
+
+    try {
+        await pool.execute(query, [specialID])
+        response.success = true;
+        response.data = 'Order refunded'
+        code = 200;
+    }
+    catch (err) {
+        console.log(err)
+        code = 500;
+        response.err = 'Please try again later'
+    }
+    res.status(code).json(response)
+}
 
 /* Add more functions */
 
@@ -151,4 +237,7 @@ module.exports = {
     getVacations,
     updateVacation,
     getVacationsByID,
+    getOrders,
+    approveOrder,
+    refundOrder,
 }

@@ -31,12 +31,17 @@ const upload = multer({
 router.get('/statistics', authAdmin, handler.getStats)
 router.get('/vacations', authAdmin, handler.getVacations)
 router.get('/vacations/:id', authAdmin, handler.getVacationsByID )
+router.get('/orders', authAdmin, handler.getOrders )
 
 // Admin POST 
 router.post('/vacation', authAdmin, upload.single('image'), handler.createVacation);
 
 // Admin PUT
 router.put('/vacation/:id', authAdmin, handler.updateVacation)
+router.put('/orders/:id/approve', authAdmin, handler.approveOrder)
+
+// Admin DELETE
+router.delete('/orders/:id/refund', authAdmin, handler.refundOrder)
 
 
 module.exports = router;

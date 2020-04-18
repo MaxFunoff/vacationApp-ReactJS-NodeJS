@@ -12,6 +12,14 @@ const Reducer = (state, action) => {
                     userVacations: action.payload.Vacations ? action.payload.Vacations : [],
                 },
             };
+        case 'UPDATE_VACATIONS_DATA':
+            return {
+                ...state,
+                userStatus: {
+                    ...state.userStatus,
+                    userVacations: action.payload
+                },
+            };
         case 'SET_LOGGED_IN':
             return {
                 ...state,

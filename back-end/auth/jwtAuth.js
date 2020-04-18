@@ -6,7 +6,6 @@ const refresh = require('./tokenRefresh')
 module.exports = authenticateToken = async (req, res, next) => {
 
     const cookies = req.cookies
-
     if (cookies['access-token'] == null) return res.sendStatus(401)
 
     jwt.verify(cookies['access-token'], process.env.ACCESS_TOKEN_SECRET, async (err, user) => {
