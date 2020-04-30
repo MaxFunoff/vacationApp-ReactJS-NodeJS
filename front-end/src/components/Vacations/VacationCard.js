@@ -105,7 +105,6 @@ const VacationCard = (props) => {
         if (vacationIndex !== -1) return true
         else return false
     }
-
     return (
         !state.userStatus.userType ? '' :
             <Box

@@ -115,7 +115,6 @@ const refundVacationFromUser = async (req, res) => {
         code = 202;
     }
     catch (err) {
-        console.log(err)
         code = 500;
         response.err = 'Please try again later'
     }
@@ -146,7 +145,6 @@ const cancelRefundVacation = async (req, res) => {
         code = 200;
     }
     catch (err) {
-        console.log(err)
         code = 500;
         response.err = 'Please try again later'
     }

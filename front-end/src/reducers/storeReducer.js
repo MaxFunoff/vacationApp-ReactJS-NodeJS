@@ -51,7 +51,7 @@ const Reducer = (state, action) => {
                     userVacations: [
                         ...state.userStatus.userVacations,
                         {
-                            id: action.payload.id,
+                            vacationId: action.payload.id,
                             Name: action.payload.name,
                             Image: action.payload.image,
                             Status: 'pending approval',
